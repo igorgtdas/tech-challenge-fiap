@@ -1,4 +1,4 @@
-"""Exporta o resultado do OLIST-2 para Excel (com fórmulas vivas) e JSON.
+"""Exporta resultados para Excel (com fórmulas vivas) e JSON. Usado pelo OLIST-2 (indicadores) e pelo OLIST-3 (achados).
 
 Estrutura do Excel:
 - Leia-me ........ como usar a planilha
@@ -7,6 +7,7 @@ Estrutura do Excel:
 - Inventario ..... as tabelas do dataset, registros, chave e granularidade
 - base_pedidos ... 1 linha por pedido (a base usada pelas fórmulas)
 - I01, I02, ... .. uma aba por indicador: definição, fórmula Excel viva, valor do Python e a tabela calculada
+- extra .......... abas adicionais (ex.: Achados), passadas como {nome: DataFrame}
 """
 import json
 import re
@@ -20,7 +21,7 @@ from . import config
 from .indicators import IndicatorBook
 
 BASE_SHEET = "base_pedidos"
-TABLE_START = 13  # linha (0-based) do cabeçalho da tabela nas abas de indicador (abaixo das até 4 fórmulas de valor)
+TABLE_START = 16  # linha (0-based) do cabeçalho da tabela nas abas de indicador (abaixo das até 8 fórmulas de valor)
 
 
 def _resolver(base_cols: dict, n_base: int, sheet: str, tab_cols: dict, tab_first: int, tab_last: int):
@@ -49,7 +50,9 @@ def _clean(v):
     return v
 
 
-def to_excel(book: IndicatorBook, rules: pd.DataFrame, inventory: pd.DataFrame, base: pd.DataFrame, path=None):
+def to_excel(book: IndicatorBook, rules: pd.DataFrame | None, inventory: pd.DataFrame | None, base: pd.DataFrame, path=None,
+             titulo="OLIST-2 · Indicadores-base do dataset Olist", notebook="notebooks/01_olist2_eda_indicadores.ipynb",
+             extra: dict | None = None):
     path = path or config.EXCEL_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
     base_cols = {c: i for i, c in enumerate(base.columns)}
@@ -72,8 +75,8 @@ def to_excel(book: IndicatorBook, rules: pd.DataFrame, inventory: pd.DataFrame, 
         # Leia-me
         ws = wb.add_worksheet("Leia-me")
         lines = [
-            ("OLIST-2 · Indicadores-base do dataset Olist", h1),
-            (f"Gerado pelo notebook notebooks/01_olist2_eda_indicadores.ipynb em {datetime.now():%d/%m/%Y %H:%M}.", None),
+            (titulo, h1),
+            (f"Gerado pelo notebook {notebook} em {datetime.now():%d/%m/%Y %H:%M}.", None),
             ("", None),
             ("Como conferir um número sem Python:", lab),
             ("1. Abra a aba Indicadores e escolha um indicador; a coluna 'aba' diz onde ele está calculado.", None),
@@ -171,15 +174,22 @@ def to_excel(book: IndicatorBook, rules: pd.DataFrame, inventory: pd.DataFrame, 
             ws.write_url(r, 8, f"internal:'{sheet}'!A1", string=sheet)
         ws.freeze_panes(1, 2)
 
-        rules.to_excel(xw, sheet_name="Regras", index=False)
-        xw.sheets["Regras"].set_column(0, 0, 6)
-        xw.sheets["Regras"].set_column(1, 2, 60, wrap)
-        xw.sheets["Regras"].set_column(3, 6, 18)
-        inventory.to_excel(xw, sheet_name="Inventario", index=False)
-        xw.sheets["Inventario"].set_column(0, 10, 20)
+        extra = dict(extra or {})
+        for name, df in extra.items():
+            df.to_excel(xw, sheet_name=name, index=False)
+            xw.sheets[name].set_column(0, len(df.columns) - 1, 40, wrap)
+            xw.sheets[name].freeze_panes(1, 1)
+        if rules is not None:
+            rules.to_excel(xw, sheet_name="Regras", index=False)
+            xw.sheets["Regras"].set_column(0, 0, 6)
+            xw.sheets["Regras"].set_column(1, 2, 60, wrap)
+            xw.sheets["Regras"].set_column(3, 6, 18)
+        if inventory is not None:
+            inventory.to_excel(xw, sheet_name="Inventario", index=False)
+            xw.sheets["Inventario"].set_column(0, 10, 20)
 
-        # ordem das abas: Leia-me, Indicadores, Regras, Inventario, base, I01...
-        order = ["Leia-me", "Indicadores", "Regras", "Inventario", BASE_SHEET] + [i.id for i in book.items]
+        # ordem das abas: Leia-me, Indicadores, extras, Regras, Inventario, base, I01...
+        order = ["Leia-me", "Indicadores", *extra, "Regras", "Inventario", BASE_SHEET] + [i.id for i in book.items]
         wb.worksheets_objs.sort(key=lambda s: order.index(s.name))
         wb.worksheets_objs[0].activate()
     return path

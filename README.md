@@ -15,16 +15,19 @@ Case FIAP/
 │  ├─ raw/                   os 9 CSVs do Kaggle, intocados (fora do git; ver data/raw/README.md)
 │  └─ processed/             bases geradas pelo notebook, ex.: base_pedidos.csv (fora do git)
 ├─ notebooks/
-│  └─ 01_olist2_eda_indicadores.ipynb   EDA, regras de qualidade e indicadores-base (card OLIST-2)
+│  ├─ 01_olist2_eda_indicadores.ipynb   EDA, regras de qualidade e indicadores-base (card OLIST-2)
+│  └─ 02_olist3_achados.ipynb           12 análises e achados de negócio (card OLIST-3)
 ├─ src/olist/                código reutilizável; a análise em si fica visível no notebook
 │  ├─ config.py              caminhos e "dicionário" das tabelas (chave, granularidade, relações)
 │  ├─ io.py                  leitura dos CSVs com tipos corretos
 │  ├─ quality.py             registro das regras de qualidade
 │  ├─ indicators.py          registro dos indicadores (definição, fórmula, origem, fórmula Excel)
+│  ├─ findings.py            registro dos achados (Fato · Leitura · Cautela · E daí?) e checagem de linguagem causal
 │  ├─ viz.py                 estilo único dos gráficos
 │  └─ export.py              Excel com fórmulas vivas e JSON
 ├─ scripts/
-│  └─ build_docx.py          gera o relatório ABNT (Word) a partir de reports/indicadores.json
+│  ├─ build_docx.py          gera o relatório ABNT do OLIST-2 (Word) a partir de reports/indicadores.json
+│  └─ build_docx_olist3.py   gera o relatório ABNT do OLIST-3 a partir de reports/achados_olist3.json
 ├─ reports/
 │  ├─ figures/               gráficos em PNG
 │  ├─ indicadores_olist.xlsx planilha: uma aba por indicador, com fórmula Excel e valor do Python
@@ -49,6 +52,7 @@ py -3.13 -m venv .venv
 2. Abra `notebooks/01_olist2_eda_indicadores.ipynb` no VS Code ou Jupyter, selecione o kernel `.venv` e rode tudo (*Run All*).
    Ele gera a base de pedidos, as figuras, a planilha e o JSON.
 3. Gere o Word: `.venv/Scripts/python scripts/build_docx.py` cria `docs/abnt/OLIST-2_relatorio.docx`.
+4. Rode `notebooks/02_olist3_achados.ipynb` (depende da base gerada pelo notebook 01) e gere o Word do OLIST-3: `.venv/Scripts/python scripts/build_docx_olist3.py`.
 
 ## Fases do projeto
 
@@ -67,7 +71,7 @@ O plano completo, com os critérios de aceite, está em `docs/case/Plano_Execuca
 | Card | Responsável | Entregável no repositório |
 |---|---|---|
 | OLIST-2 · Dataset e indicadores-base | Igor | notebook 01, `reports/`, `docs/abnt/OLIST-2_relatorio.docx` |
-| OLIST-3 · Achados de negócio | Igor | (próximo notebook) |
+| OLIST-3 · Achados de negócio | Igor | notebook 02, `reports/achados_olist3.*`, `docs/abnt/OLIST-3_relatorio.docx` |
 | OLIST-4 · Gráficos e vídeo | Diogo | — |
 | OLIST-5 · Oportunidades e matriz | Lorran | — |
 | OLIST-6 · Impacto, KPIs e roadmap | Diogo | — |

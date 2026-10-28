@@ -1,0 +1,393 @@
+{
+  "achados": [
+    {
+      "id": "N1",
+      "tipo": "núcleo",
+      "titulo": "O atraso aparece junto com a insatisfação, e a parte de notas ruins cresce com os dias de atraso até cerca de uma semana",
+      "pergunta": "A nota do cliente muda quando o pedido chega atrasado?",
+      "dimensoes": "pedidos, logística, avaliações",
+      "desafios": "Experiência do cliente, Eficiência logística, Gestão de avaliações (reviews)",
+      "fato": "Entre os pedidos entregues com atraso, 62,4% receberam nota 1 ou 2; entre os entregues no prazo, 9,3%. A parte de notas negativas sobe de 32% (1 a 3 dias de atraso) para 68% (4 a 7 dias) e fica perto de 79% a partir de 8 dias.",
+      "leitura": "A pontualidade está fortemente associada à satisfação: o cliente que recebe no prazo raramente avalia mal, e o que espera além do prometido avalia mal na maioria das vezes.",
+      "cautela": "É associação: pedidos atrasados podem ter outras características (região, produto, vendedor) que também pesam na nota. A avaliação depende de o cliente responder a pesquisa.",
+      "e_dai": "Proteger o prazo, ou avisar o cliente antes de o atraso acontecer, é uma das alavancas mais claras para a nota. É aqui que um agente de acompanhamento de entregas ganha sentido.",
+      "metricas": "M01",
+      "figura": "o3_n1_atraso_nota"
+    },
+    {
+      "id": "N2",
+      "tipo": "núcleo",
+      "titulo": "Problemas de entrega respondem por uma fatia grande das notas ruins, muito maior que o seu peso nos pedidos",
+      "pergunta": "Que parte das avaliações negativas está ligada a atraso ou a pedido não entregue?",
+      "dimensoes": "pedidos, logística, avaliações",
+      "desafios": "Gestão de avaliações (reviews), Eficiência logística",
+      "fato": "Os pedidos atrasados são 6,8% dos entregues, mas concentram 27,5% de todas as notas 1 ou 2. Outros 15,4% das notas negativas vêm de pedidos que não foram entregues ou não têm data de entrega válida.",
+      "leitura": "Somando atraso e não entrega, cerca de 43% das avaliações ruins estão ligadas à entrega. O restante passa por produto, atendimento e outros motivos, vistos em N3.",
+      "cautela": "Um pedido entregue no prazo também pode ter tido problema de entrega, como produto danificado no transporte. Por isso a fatia ligada à entrega tende a estar subestimada, e não superestimada.",
+      "e_dai": "Melhorar a entrega atinge a maior parte do problema de reputação, mas não todo. A outra parte pede olhar o conteúdo dos comentários (N3).",
+      "metricas": "M02",
+      "figura": ""
+    },
+    {
+      "id": "N3",
+      "tipo": "núcleo",
+      "titulo": "Os comentários negativos falam primeiro de entrega e, em seguida, de produto errado ou com defeito",
+      "pergunta": "Do que o cliente insatisfeito reclama quando escreve?",
+      "dimensoes": "avaliações, logística, produtos",
+      "desafios": "Gestão de avaliações (reviews), Automação de processos, Experiência do cliente",
+      "fato": "Dos 10.838 comentários de avaliações com nota 1 ou 2, 45% citam entrega (não recebeu ou atraso) e 32% citam o produto (errado, incompleto, com defeito ou de má qualidade). Atendimento aparece em 13% e cancelamento, troca ou reembolso em 14%.",
+      "leitura": "O texto confirma o que os números de prazo mostram (N1, N2) e acrescenta um segundo bloco de problemas, ligado ao produto e ao vendedor, que o prazo não explica.",
+      "cautela": "A classificação por palavras-chave é aproximada: erra ironias e frases fora do padrão e não pega todos os casos. Só uma parte dos clientes escreve comentário, então o retrato pode pender para os mais insatisfeitos.",
+      "e_dai": "Há milhares de textos em português esperando leitura. Classificar, priorizar e encaminhar esses comentários automaticamente é um caso típico de IA generativa, com ganho de escala para o atendimento.",
+      "metricas": "M03",
+      "figura": "o3_n3_temas_comentarios"
+    },
+    {
+      "id": "N4",
+      "tipo": "núcleo",
+      "titulo": "Cancelar é raro, mas quase sempre acontece depois do pagamento aprovado, e metade dos casos é falta de produto",
+      "pergunta": "Quantos pedidos não se concretizam e em que ponto?",
+      "dimensoes": "pedidos, produtos",
+      "desafios": "Eficiência operacional, Experiência do cliente",
+      "fato": "1,2% dos pedidos foram cancelados ou ficaram indisponíveis. Desses, 49% são indisponibilidade (o produto não estava disponível), 89% já tinham o pagamento aprovado e 6% chegaram a ser postados.",
+      "leitura": "O volume é pequeno, mas a maior parte dos casos acontece depois da aprovação do pagamento. Isso é compatível com estoque desatualizado no vendedor: o cliente paga por algo que não existe.",
+      "cautela": "O dataset não traz o motivo do cancelamento nem quem cancelou (cliente, vendedor ou Olist). A taxa mensal oscila pouco e não mostra tendência clara.",
+      "e_dai": "Conferir a disponibilidade com o vendedor antes de confirmar a venda e avisar o cliente rapidamente quando faltar produto são automações simples, de baixo risco, para a operação.",
+      "metricas": "M04",
+      "figura": ""
+    },
+    {
+      "id": "N5",
+      "tipo": "núcleo",
+      "titulo": "Quase ninguém volta a comprar, e a nota da primeira compra quase não muda isso",
+      "pergunta": "Quantos clientes voltam e a experiência da primeira compra faz diferença?",
+      "dimensoes": "clientes, pedidos, avaliações",
+      "desafios": "Retenção e fidelização, Apoio à tomada de decisão",
+      "fato": "Só 3,1% dos clientes fizeram mais de um pedido. A recompra é de 3,1% quando a primeira compra teve nota 4 ou 5 e de 3,1% quando teve nota 1 ou 2; com a primeira compra atrasada, 2,6%. 31% das segundas compras acontecem no mesmo dia da primeira.",
+      "leitura": "A recompra é baixa em todos os grupos, e a satisfação com a primeira compra quase não a altera. Parte das recompras no mesmo dia parece ser o mesmo carrinho dividido em pedidos, não uma volta do cliente.",
+      "cautela": "Baixa recompra não é o mesmo que perda de cliente (churn): o período tem cerca de dois anos, muitos produtos são de compra rara e o cliente pode voltar à Olist por outro marketplace, sem aparecer como o mesmo cliente.",
+      "e_dai": "Satisfação sozinha não está trazendo o cliente de volta. Retenção pede ação ativa, como comunicação pós-venda e ofertas no momento certo, e não só evitar a nota ruim.",
+      "metricas": "M05",
+      "figura": ""
+    },
+    {
+      "id": "N6",
+      "tipo": "núcleo",
+      "titulo": "O atraso se concentra no Norte e no Nordeste",
+      "pergunta": "O atraso é igual no país inteiro?",
+      "dimensoes": "clientes, logística, geolocalização",
+      "desafios": "Eficiência logística, Apoio à tomada de decisão",
+      "fato": "A taxa de atraso é de 12,7% no Nordeste e 8,6% no Norte, contra 6,1% no Sudeste e 5,9% no Sul. Por estado, MA lidera (17,4%) entre os que têm 500 ou mais entregas.",
+      "leitura": "Os clientes mais distantes do eixo onde estão os vendedores sofrem mais atraso, embora o prazo prometido para eles já seja maior: em média 38 dias no Norte e 31 no Nordeste, contra 22 no Sudeste. Mesmo com essa folga, a promessa não acompanha a dificuldade real da rota.",
+      "cautela": "Estados pequenos têm poucas entregas e taxas instáveis. Região é um resumo: dentro dela há diferenças entre capital e interior que o dado por estado não mostra.",
+      "e_dai": "Prazo prometido e acompanhamento podem ser calibrados por rota. Um agente de previsão de risco de atraso por região e vendedor é um uso direto deste achado.",
+      "metricas": "M06",
+      "figura": "o3_n6_atraso_regiao"
+    },
+    {
+      "id": "D1",
+      "tipo": "diferencial",
+      "titulo": "O atraso nasce sobretudo no transporte, e a postagem fora do prazo do vendedor multiplica o risco por 3,9",
+      "pergunta": "Em que etapa do ciclo o pedido atrasado perde tempo?",
+      "dimensoes": "pedidos, logística, vendedores",
+      "desafios": "Eficiência logística, Eficiência operacional, Automação de processos",
+      "fato": "Nos pedidos atrasados, o transporte leva em média 27,9 dias, contra 8,0 nos entregues no prazo. A postagem pelo vendedor leva 5,6 dias, contra 2,7. A aprovação do pagamento é igual nos dois grupos (menos de 1 dia). 9,0% dos pedidos foram postados depois do prazo-limite do vendedor; esses atrasam em 20,9% dos casos, contra 5,4% dos postados no prazo.",
+      "leitura": "O prazo prometido é parecido para os dois grupos (cerca de 23 dias), então o atraso não vem de uma promessa mais curta. Ele se forma no transporte e, em parte, na demora do vendedor para postar. A postagem fora do limite é um sinal de alerta que aparece dias antes de o atraso se concretizar.",
+      "cautela": "As datas de postagem e entrega são registros operacionais e podem ter erros (a regra R6 já tirou os casos impossíveis). O dado não diz qual transportadora fez a entrega.",
+      "e_dai": "Há um gatilho objetivo para agir cedo: vendedor que passou do prazo de postagem. Um agente pode monitorar esse sinal, cobrar o vendedor e avisar o cliente antes que o atraso vire nota ruim.",
+      "metricas": "M07",
+      "figura": "o3_d1_etapas_ciclo"
+    },
+    {
+      "id": "D2",
+      "tipo": "diferencial",
+      "titulo": "Os atrasos se concentram nos grandes vendedores, mas entre vendedores de porte parecido a taxa varia muito",
+      "pergunta": "O atraso está concentrado em alguns vendedores?",
+      "dimensoes": "vendedores, logística",
+      "desafios": "Apoio à tomada de decisão, Eficiência logística, Escalabilidade da operação",
+      "fato": "97 dos 2.957 vendedores com entregas (3,3%) respondem por metade dos pedidos atrasados. Metade dos pedidos vem de 127 vendedores, então a concentração dos atrasos acompanha a das vendas. Entre os 418 vendedores com 50 ou mais entregas, a taxa de atraso vai de 3,6% (quartil inferior) a 8,9% (quartil superior), e 6% deles atrasam o dobro da média ou mais.",
+      "leitura": "Os grandes vendedores pesam mais nos atrasos porque vendem mais, mas, entre vendedores de porte parecido, há os que entregam bem e os que atrasam com frequência. Isso é compatível com diferenças de processo de cada vendedor.",
+      "cautela": "A taxa de um vendedor mistura sua própria agilidade com a região dos clientes e a transportadora usada. O vendedor do pedido é o do item de maior preço; pedidos com vários vendedores são poucos.",
+      "e_dai": "Acompanhar os vendedores pelo desempenho de entrega permite agir onde o problema se repete. Um agente pode gerar alertas e recomendações para o time que cuida dos lojistas, com foco em poucos vendedores e grande efeito.",
+      "metricas": "M08",
+      "figura": "o3_d2_vendedores"
+    },
+    {
+      "id": "D3",
+      "tipo": "diferencial",
+      "titulo": "Produtos pesados atrasam mais e são pior avaliados, e o atraso quase dobra entre a melhor e a pior categoria",
+      "pergunta": "Categoria e peso do produto estão associados a atraso e nota?",
+      "dimensoes": "produtos, logística, avaliações",
+      "desafios": "Eficiência logística, Experiência do cliente",
+      "fato": "Pedidos com mais de 10 kg atrasam em 8,9% dos casos, contra 6,5% nos de até 0,5 kg, e têm nota média 3,90, contra 4,19. Entre as categorias com 1.000 ou mais entregas, a taxa de atraso vai de 4,2% (malas_acessorios) a 8,1% (bebes).",
+      "leitura": "Peso e categoria aparecem associados ao atraso e à nota. Itens volumosos exigem transporte diferente e parecem sofrer mais na rota. Móveis de escritório combinam atraso acima da média com a pior nota entre as grandes categorias (3,65).",
+      "cautela": "Peso e categoria andam juntos (móveis são pesados) e com a região do cliente. O peso vem do cadastro do produto e falta em poucos casos (regra R5).",
+      "e_dai": "Pedidos pesados merecem prazo prometido mais realista e acompanhamento mais próximo. O peso é uma variável útil para um agente que estima o risco de atraso no momento da compra.",
+      "metricas": "M09",
+      "figura": "o3_d3_peso_categoria"
+    },
+    {
+      "id": "D4",
+      "tipo": "diferencial",
+      "titulo": "O peso do frete e a forma de pagamento quase não mudam a nota; o que pesa é o prazo",
+      "pergunta": "Frete caro ou forma de pagamento estão associados a notas piores?",
+      "dimensoes": "pagamentos, produtos, avaliações",
+      "desafios": "Experiência do cliente, Apoio à tomada de decisão",
+      "fato": "A nota média vai de 4,20 nos pedidos em que o frete pesa menos para 4,11 nos que pesa mais, uma diferença de 0,10 ponto. Entre as formas de pagamento, a nota média fica entre 4,00 e 4,17. 68% das compras no cartão são parceladas.",
+      "leitura": "Comparada à queda de cerca de 2 pontos associada ao atraso (OLIST-2, I09), a diferença ligada ao frete é pequena. O cliente parece aceitar o preço do frete combinado na compra; o que ele não aceita é o prazo descumprido.",
+      "cautela": "O dado não traz o frete de concorrentes nem o abandono de carrinho: clientes que desistiram da compra pelo valor do frete não aparecem. A análise vale só para quem comprou.",
+      "e_dai": "Para a satisfação, cumprir o prazo vale mais do que baratear o frete. Esse achado ajuda a priorizar: agentes ligados a prazo e comunicação vêm antes de agentes de preço de frete.",
+      "metricas": "M10",
+      "figura": ""
+    },
+    {
+      "id": "D5",
+      "tipo": "diferencial",
+      "titulo": "O atraso tem picos em poucos meses: na Black Friday de 2017 junto com o volume, e em fevereiro–março de 2018 sem aumento de volume",
+      "pergunta": "O atraso muda ao longo do ano?",
+      "dimensoes": "pedidos, logística, avaliações",
+      "desafios": "Escalabilidade da operação, Eficiência logística, Apoio à tomada de decisão",
+      "fato": "A taxa de atraso mensal fica perto de 4% na maior parte dos meses, mas chega a 12,4% em novembro de 2017 (Black Friday), 14,1% em fevereiro e 19,0% em março de 2018. Nesses meses a nota média cai para 3,99, 3,88 e 3,81.",
+      "leitura": "Na Black Friday, o salto de atraso coincide com o maior volume do período (7.288 entregas). Em fevereiro e março de 2018 o volume foi parecido com o de janeiro (7.069), que teve atraso de 5,7%; esse pico é compatível com fatores externos, como greves ou problemas nas transportadoras, que o dado não registra. Nos dois casos, a nota acompanha a pontualidade.",
+      "cautela": "São poucos meses de pico, e não sabemos o que aconteceu fora da Olist nesses períodos. A série tem menos de dois anos completos, então não dá para afirmar um padrão anual.",
+      "e_dai": "Planejar a capacidade antes das datas de pico e ajustar o prazo prometido nesses períodos protege a nota. Um agente de apoio à decisão pode simular o volume esperado e sugerir prazos e reforços com antecedência.",
+      "metricas": "M11",
+      "figura": "o3_d5_sazonalidade"
+    },
+    {
+      "id": "D6",
+      "tipo": "diferencial",
+      "titulo": "A distância entre vendedor e cliente acompanha o atraso, e a maioria das vendas cruza estados",
+      "pergunta": "A distância e a rota entre vendedor e cliente estão associadas ao atraso?",
+      "dimensoes": "geolocalização, vendedores, clientes, logística",
+      "desafios": "Eficiência logística, Apoio à tomada de decisão, Escalabilidade da operação",
+      "fato": "A taxa de atraso sobe de 4,5% (até 100 km) para 12,0% (mais de 2.000 km). Quando vendedor e cliente estão em estados diferentes, o atraso é de 8,0% e o prazo médio de 15,2 dias; no mesmo estado, 4,5% e 7,9 dias. 64% das entregas cruzam estados.",
+      "leitura": "A rota acompanha boa parte da diferença regional vista em N6: os vendedores estão concentrados no Sudeste, e o cliente distante depende de transporte longo, que é onde o atraso nasce (D1).",
+      "cautela": "A distância em linha reta é uma aproximação da rota real. CEPs sem coordenada (menos de 1%) ficam de fora.",
+      "e_dai": "Aproximar a oferta do cliente, com vendedores ou estoques em outras regiões, e calibrar o prazo pela distância são alavancas estratégicas. A distância também é uma variável simples para o agente que estima o risco de atraso.",
+      "metricas": "M12",
+      "figura": "o3_d6_distancia"
+    }
+  ],
+  "chave": [
+    {
+      "rank": 1,
+      "titulo": "Atraso é o maior detrator da satisfação",
+      "resumo": "Atrasados recebem nota 1–2 em 62% dos casos, contra 9% no prazo, e concentram 27% das notas negativas sendo 6,8% dos pedidos.",
+      "achados": "N1, N2",
+      "desafios": "Experiência do cliente, Gestão de avaliações (reviews), Eficiência logística",
+      "para_quem": "Diogo: gráfico principal e KPI de nota (OLIST-4, OLIST-6) · Lorran: oportunidade nº 1 (OLIST-5)",
+      "oportunidade": "Agir antes do atraso: monitorar pedidos em risco e avisar o cliente de forma proativa."
+    },
+    {
+      "rank": 2,
+      "titulo": "O atraso dá sinal antes de acontecer",
+      "resumo": "No atraso, o transporte leva 27,9 dias contra 8,0; postagem fora do limite do vendedor (9% dos pedidos) eleva o atraso de 5% para 21%.",
+      "achados": "D1, D2",
+      "desafios": "Eficiência logística, Eficiência operacional, Automação de processos",
+      "para_quem": "Lorran: gatilho do agente de entregas (OLIST-8) · Diogo: KPI de postagem no prazo (OLIST-6)",
+      "oportunidade": "Automatizar o acompanhamento: alertas para vendedor atrasado na postagem e para pedido parado no transporte."
+    },
+    {
+      "rank": 3,
+      "titulo": "Reclamações em texto em escala, com tema previsível",
+      "resumo": "45% dos comentários negativos falam de entrega e 32% de produto errado ou com defeito, em 10.838 textos.",
+      "achados": "N3",
+      "desafios": "Gestão de avaliações (reviews), Automação de processos, Experiência do cliente",
+      "para_quem": "Lorran: agente de avaliações e exemplo de prompt com comentário real (OLIST-8, OLIST-9)",
+      "oportunidade": "IA generativa para ler, classificar, priorizar e responder avaliações e reclamações."
+    },
+    {
+      "rank": 4,
+      "titulo": "Geografia e distância definem quem sofre o atraso",
+      "resumo": "Nordeste atrasa 12,7% e Norte 8,6%, contra 6,1% no Sudeste; venda entre estados atrasa 8,0% contra 4,5% no mesmo estado.",
+      "achados": "N6, D6, D3",
+      "desafios": "Eficiência logística, Apoio à tomada de decisão, Escalabilidade da operação",
+      "para_quem": "Diogo: mapa ou gráfico regional (OLIST-4) · Lorran: variáveis do agente de risco de atraso (OLIST-8)",
+      "oportunidade": "Prever o risco de atraso por rota, peso e vendedor e calibrar o prazo prometido."
+    },
+    {
+      "rank": 5,
+      "titulo": "A entrega tem picos de atraso em poucos meses do ano",
+      "resumo": "Atraso de 12% na Black Friday de 2017 e de 19% em março de 2018, contra cerca de 4% nos meses normais.",
+      "achados": "D5",
+      "desafios": "Escalabilidade da operação, Apoio à tomada de decisão",
+      "para_quem": "Diogo: gráfico de sazonalidade e roadmap (OLIST-4, OLIST-6) · Lorran: agente de apoio à decisão (OLIST-5, OLIST-8)",
+      "oportunidade": "Apoio à decisão para planejar capacidade e prazo antes das datas de pico e reagir rápido quando a pontualidade cair."
+    },
+    {
+      "rank": 6,
+      "titulo": "Recompra baixa e indiferente à satisfação",
+      "resumo": "Só 3,1% dos clientes voltam, com nota boa (3,1%) ou ruim (3,1%) na primeira compra.",
+      "achados": "N5, N4",
+      "desafios": "Retenção e fidelização, Experiência do cliente",
+      "para_quem": "Lorran: oportunidade de retenção (OLIST-5) · Diogo: KPI de recompra e cautela sobre churn (OLIST-6)",
+      "oportunidade": "Retenção ativa no pós-venda: comunicação e ofertas personalizadas, não só evitar a nota ruim."
+    }
+  ],
+  "metricas": [
+    {
+      "id": "M01",
+      "nome": "% de notas negativas: atrasados × no prazo",
+      "definicao": "Parte dos pedidos avaliados com nota 1 ou 2, separando os entregues com atraso dos entregues no prazo.",
+      "formula": "Pedidos atrasados com nota 1–2 ÷ pedidos atrasados avaliados (e o mesmo para os no prazo).",
+      "tabelas": "orders, order_reviews",
+      "regras": "R3, R4, R6",
+      "valor": 0.6241968343519825,
+      "texto": "62,4%"
+    },
+    {
+      "id": "M02",
+      "nome": "Origem das notas negativas",
+      "definicao": "Parte das avaliações com nota 1 ou 2 que vêm de pedidos atrasados e de pedidos não entregues.",
+      "formula": "Notas 1–2 de pedidos atrasados ÷ total de notas 1–2 (e o mesmo para os não entregues).",
+      "tabelas": "orders, order_reviews",
+      "regras": "R3, R4, R6",
+      "valor": 0.2748033669104457,
+      "texto": "27,5%"
+    },
+    {
+      "id": "M03",
+      "nome": "Temas dos comentários negativos",
+      "definicao": "Parte dos comentários de avaliações com nota 1 ou 2 que citam cada tema (um comentário pode ter vários temas).",
+      "formula": "Comentários negativos com o tema ÷ comentários negativos com texto.",
+      "tabelas": "order_reviews",
+      "regras": "R3, R5",
+      "valor": 0.45192840007381435,
+      "texto": "45,2%"
+    },
+    {
+      "id": "M04",
+      "nome": "Cancelamentos e indisponibilidade",
+      "definicao": "Pedidos cancelados ou indisponíveis e em que etapa estavam: aprovados e já postados.",
+      "formula": "Cancelados ou indisponíveis ÷ pedidos totais; entre eles, a parte indisponível, a parte aprovada e a parte já postada.",
+      "tabelas": "orders",
+      "regras": "R1",
+      "valor": 0.012409368369183738,
+      "texto": "1,2%"
+    },
+    {
+      "id": "M05",
+      "nome": "Recompra pela experiência da primeira compra",
+      "definicao": "Parte dos clientes com 2 ou mais pedidos, conforme a nota e o atraso da primeira compra; e quanto tempo leva a segunda compra.",
+      "formula": "Clientes cuja primeira compra teve nota 4–5 (ou 1–2) e que voltaram ÷ clientes cuja primeira compra teve essa nota.",
+      "tabelas": "orders, customers, order_reviews",
+      "regras": "R1, R2, R3",
+      "valor": 0.031187562437562436,
+      "texto": "3,1%"
+    },
+    {
+      "id": "M06",
+      "nome": "Taxa de atraso por região e UF",
+      "definicao": "Taxa de atraso dos pedidos entregues, por região e por estado do cliente.",
+      "formula": "Por região (ou UF): pedidos atrasados ÷ pedidos entregues válidos.",
+      "tabelas": "orders, customers",
+      "regras": "R2, R4, R6",
+      "valor": 0.127156125608138,
+      "texto": "12,7%"
+    },
+    {
+      "id": "M07",
+      "nome": "Tempo médio por etapa: atrasados × no prazo",
+      "definicao": "Dias médios em cada etapa do ciclo (aprovação, postagem, transporte) e prazo prometido, para pedidos entregues no prazo e com atraso; postagem fora do prazo-limite.",
+      "formula": "Média dos dias da etapa por grupo; postagens após o limite ÷ pedidos entregues; taxa de atraso com e sem postagem fora do limite.",
+      "tabelas": "orders, order_items",
+      "regras": "R4, R6",
+      "valor": 27.888366753405787,
+      "texto": "27,89 dias"
+    },
+    {
+      "id": "M08",
+      "nome": "Concentração do atraso por vendedor",
+      "definicao": "Quantos vendedores concentram metade dos atrasos e, entre os vendedores com 50 ou mais entregas, que parte atrasa o dobro da média.",
+      "formula": "Vendedores (ordenados por atrasos) até 50% dos atrasos acumulados; vendedores com 50+ entregas e taxa ≥ 2× a média ÷ vendedores com 50+ entregas.",
+      "tabelas": "order_items, sellers, orders",
+      "regras": "R1, R4, R6",
+      "valor": 97.0,
+      "texto": "97 vendedores"
+    },
+    {
+      "id": "M09",
+      "nome": "Atraso e nota por peso e categoria",
+      "definicao": "Taxa de atraso, nota média e prazo por faixa de peso do pedido; a aba traz também as categorias com 1.000 ou mais entregas.",
+      "formula": "Por faixa de peso: pedidos atrasados ÷ entregues; média das notas; média do prazo.",
+      "tabelas": "products, order_items, orders, order_reviews",
+      "regras": "R1, R4, R5, R6",
+      "valor": 0.08869895536562203,
+      "texto": "8,9%"
+    },
+    {
+      "id": "M10",
+      "nome": "Nota por peso do frete e forma de pagamento",
+      "definicao": "Nota média dos pedidos entregues por quintil do peso do frete no valor (frete ÷ preço + frete); a aba traz a nota por forma de pagamento.",
+      "formula": "Por quintil de frete: média das notas dos pedidos entregues; diferença entre o quintil de maior e o de menor frete.",
+      "tabelas": "order_items, payments, order_reviews",
+      "regras": "R3, R8",
+      "valor": 0.09545086279050174,
+      "texto": "0,1 pontos"
+    },
+    {
+      "id": "M11",
+      "nome": "Taxa de atraso e nota por mês",
+      "definicao": "Taxa de atraso e nota média dos pedidos entregues, por mês de compra (jan/2017 a ago/2018, sem meses de borda).",
+      "formula": "Por mês: pedidos atrasados ÷ pedidos entregues válidos; média das notas.",
+      "tabelas": "orders, order_reviews",
+      "regras": "R3, R4, R6",
+      "valor": 0.18963301442239042,
+      "texto": "19,0%"
+    },
+    {
+      "id": "M12",
+      "nome": "Atraso por distância e por rota (mesma UF × outra UF)",
+      "definicao": "Taxa de atraso e prazo dos pedidos entregues conforme a distância entre vendedor e cliente e conforme estejam no mesmo estado.",
+      "formula": "Por faixa de distância (ou rota): pedidos atrasados ÷ entregues válidos; média do prazo.",
+      "tabelas": "orders, customers, sellers, geolocation",
+      "regras": "R4, R6, R7",
+      "valor": 0.08047465639215813,
+      "texto": "8,0%"
+    }
+  ],
+  "cobertura": [
+    {
+      "dimensão": "clientes",
+      "achados": "N5, N6, D6",
+      "coberta": "sim"
+    },
+    {
+      "dimensão": "pedidos",
+      "achados": "N1, N2, N4, N5, D1, D5",
+      "coberta": "sim"
+    },
+    {
+      "dimensão": "pagamentos",
+      "achados": "D4",
+      "coberta": "sim"
+    },
+    {
+      "dimensão": "produtos",
+      "achados": "N3, N4, D3, D4",
+      "coberta": "sim"
+    },
+    {
+      "dimensão": "logística",
+      "achados": "N1, N2, N3, N6, D1, D2, D3, D5, D6",
+      "coberta": "sim"
+    },
+    {
+      "dimensão": "vendedores",
+      "achados": "D1, D2, D6",
+      "coberta": "sim"
+    },
+    {
+      "dimensão": "avaliações",
+      "achados": "N1, N2, N3, N5, D3, D4, D5",
+      "coberta": "sim"
+    },
+    {
+      "dimensão": "geolocalização",
+      "achados": "N6, D6",
+      "coberta": "sim"
+    }
+  ],
+  "comentarios_negativos": 10838
+}
