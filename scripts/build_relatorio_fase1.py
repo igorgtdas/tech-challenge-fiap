@@ -192,7 +192,7 @@ def build():
 
     # ------------------------------------------------------------------ 5
     titulo(doc, "5. Oportunidades e priorização")
-    b.body(doc, "Proposta inicial de oportunidades, derivada dos achados-chave (Tabela 4):")
+    b.body(doc, f"Proposta inicial de oportunidades, derivada dos achados-chave (Tabela {n_tab + 1}):")
     n_tab += 1
     b.caption(doc, f"Tabela {n_tab}. Oportunidades candidatas e achado que as sustenta.")
     b.table(doc, ["#", "Oportunidade", "Achado que sustenta"],
@@ -204,7 +204,7 @@ def build():
     titulo(doc, "6. Mapa de agentes")
     b.body(doc, (
         "Proposta inicial de três agentes, que cobrem o ciclo da entrega: o primeiro age antes do problema, o segundo depois da reclamação e o "
-        "terceiro apoia quem decide (Tabela 5)."
+        f"terceiro apoia quem decide (Tabela {n_tab + 1})."
     ))
     agentes = [
         ("Sentinela de Entregas", "Prevenir o atraso e avisar o cliente antes que ele aconteça",
@@ -270,7 +270,7 @@ def build():
 
     # ------------------------------------------------------------------ 10
     titulo(doc, "10. Impacto esperado e indicadores")
-    b.body(doc, "Linhas de base medidas no dataset, que servirão de ponto de partida para os KPIs dos agentes (Tabela 6):")
+    b.body(doc, f"Linhas de base medidas no dataset, que servirão de ponto de partida para os KPIs dos agentes (Tabela {n_tab + 1}):")
     base = [
         ("Taxa de atraso", I["I05"]["texto"], "Sentinela, Copiloto"),
         ("% de notas 1–2 entre atrasados", b.br_pct(V(o3, "M01", "atrasados")), "Sentinela"),
