@@ -3,15 +3,15 @@
 Uso (na raiz do projeto, com o .venv ativo e depois de rodar os notebooks 01 e 02):
     python scripts/build_relatorio_fase1.py
 
-- Títulos de seção em vermelho (rascunho em construção).
-- Seções com dados (contexto, método, achados, limitações) já vêm escritas, com os números de
-  reports/indicadores.json e reports/achados_olist3.json.
-- Seções que dependem de outros cards trazem uma proposta inicial ou um marcador "[A FAZER]" com o card e o responsável.
+- Seções prontas: título preto, texto escrito com os números de reports/indicadores.json e reports/achados_olist3.json.
+- Seções que ainda não estão prontas: título em vermelho e uma caixa vermelha dizendo o que falta,
+  a que card se refere e quem é o responsável. Quando a seção ficar pronta, tire o título de PENDENTES.
 """
 import json
 
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
+from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
 import build_docx as b
@@ -19,21 +19,46 @@ from olist import config
 
 OUT = b.ABNT / "Relatorio_Executivo_Fase1_rascunho.docx"
 RED = "C00000"
+RED_FILL = "FDECEA"
 GRAY = "7F7F7F"
+
+# Seções que ainda não estão prontas: o título sai em vermelho. Uma seção-mãe fica vermelha se alguma parte dela estiver pendente.
+PENDENTES = {
+    "Sumário Executivo", "3. O que os dados mostram",
+    "5. Oportunidades e priorização", "6. Mapa de agentes",
+    "7. Fichas dos agentes: responsabilidades, limites e autonomia", "7.1 Sentinela de Entregas", "7.2 Voz do Cliente", "7.3 Copiloto Operacional",
+    "8. Arquitetura conceitual", "8.1 Diagrama", "8.2 Fluxo das informações", "8.3 Governança, monitoramento e integrações futuras",
+    "9. Prompts estruturados", "9.1 Prompt · Sentinela de Entregas", "9.2 Prompt · Voz do Cliente", "9.3 Prompt · Copiloto Operacional",
+    "10. Impacto esperado e indicadores", "10.1 O que podemos e o que não podemos afirmar",
+    "11. Riscos, governança e autonomia", "12. Roadmap nas cinco fases", "13. Conclusão e recomendação", "Vídeo executivo",
+}
 
 
 def titulo(doc, text, level=1):
-    """Título de seção em vermelho (nível 1 em negrito; nível 2 em negrito itálico)."""
+    """Título de seção (nível 1 em negrito; nível 2 em negrito itálico); vermelho se a seção ainda não está pronta."""
     p = b._para(doc, align=WD_ALIGN_PARAGRAPH.LEFT, before=14 if level == 1 else 8, after=6, keep=True)
-    b._font(p.add_run(text), 12 if level == 1 else 11, bold=True, italic=level == 2, color=RED)
+    b._font(p.add_run(text), 12 if level == 1 else 11, bold=True, italic=level == 2, color=RED if text in PENDENTES else None)
     return p
 
 
 def afazer(doc, card, quem, texto):
-    """Marcador de pendência: o que falta, em qual card e com quem."""
-    p = b._para(doc, align=WD_ALIGN_PARAGRAPH.LEFT, line=1.15, before=2, after=6)
-    b._font(p.add_run(f"[A FAZER · {card} · {quem}] "), 10, bold=True, color=GRAY)
-    b._font(p.add_run(texto), 10, italic=True, color=GRAY)
+    """Caixa vermelha de pendência: a que card se refere, quem é o responsável e o que falta."""
+    p = b._para(doc, align=WD_ALIGN_PARAGRAPH.LEFT, line=1.15, before=4, after=8)
+    p.paragraph_format.left_indent = b.Cm(0.2)
+    p.paragraph_format.right_indent = b.Cm(0.2)
+    pPr = p._p.get_or_add_pPr()
+    bdr = OxmlElement("w:pBdr")
+    for side in ("top", "left", "bottom", "right"):
+        e = OxmlElement(f"w:{side}")
+        e.set(qn("w:val"), "single"); e.set(qn("w:sz"), "12"); e.set(qn("w:space"), "4"); e.set(qn("w:color"), RED)
+        bdr.append(e)
+    pPr.append(bdr)
+    shd = OxmlElement("w:shd")
+    shd.set(qn("w:val"), "clear"); shd.set(qn("w:color"), "auto"); shd.set(qn("w:fill"), RED_FILL)
+    pPr.append(shd)
+    b._font(p.add_run(f"A FAZER · Card {card} · {quem}"), 10, bold=True, color=RED)
+    p.add_run().add_break()
+    b._font(p.add_run(texto), 10, color=RED)
     return p
 
 
@@ -61,7 +86,7 @@ def build():
     b.rich(b._para(doc, align=WD_ALIGN_PARAGRAPH.CENTER), "Diogo; Igor; Lorran", base_bold=True)
     b.rich(b._para(doc, align=WD_ALIGN_PARAGRAPH.CENTER, line=1.0), "Relatório Executivo · Tech Challenge Agentic AI – Fase 1 · FIAP · 2026", size=10)
     p = b._para(doc, align=WD_ALIGN_PARAGRAPH.CENTER, line=1.0, before=6, after=10)
-    b._font(p.add_run("RASCUNHO EM CONSTRUÇÃO: títulos em vermelho e marcadores [A FAZER] indicam o que ainda falta."), 9, italic=True, color=GRAY)
+    b._font(p.add_run("RASCUNHO EM CONSTRUÇÃO: títulos em vermelho marcam as seções que ainda não estão prontas; as caixas vermelhas dizem o que falta e a que card se refere."), 9, italic=True, color=GRAY)
 
     # ------------------------------------------------------------------ sumário executivo
     titulo(doc, "Sumário Executivo")
@@ -145,6 +170,7 @@ def build():
 
     # ------------------------------------------------------------------ 3
     titulo(doc, "3. O que os dados mostram")
+    afazer(doc, "OLIST-4", "Diogo", "Texto e números desta seção estão prontos. Falta trocar ou complementar as figuras pelos gráficos finais no padrão visual do relatório.")
     secoes = [
         ("3.1 Atraso e satisfação andam juntos", ["N1", "N2"], ("o3_n1_atraso_nota", "Percentual de notas 1 ou 2 por faixa de atraso.")),
         ("3.2 O que dizem os comentários negativos", ["N3"], ("o3_n3_temas_comentarios", "Temas dos comentários de avaliações com nota 1 ou 2.")),
@@ -169,7 +195,6 @@ def build():
     b.table(doc, ["#", "Achado", "Evidência", "Desafios"],
             [[k["rank"], k["titulo"], k["resumo"], k["desafios"]] for k in o3["chave"]], [0.7, 3.6, 7.6, 4.1], size=8)
     b.source(doc)
-    afazer(doc, "OLIST-4", "Diogo", "Trocar ou complementar as figuras desta seção pelos gráficos finais no padrão visual do relatório.")
 
     # ------------------------------------------------------------------ 4
     titulo(doc, "4. Análises complementares e limitações")
