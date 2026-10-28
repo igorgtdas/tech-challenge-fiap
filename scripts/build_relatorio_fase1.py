@@ -24,7 +24,7 @@ GRAY = "7F7F7F"
 
 # Seções que ainda não estão prontas: o título sai em vermelho. Uma seção-mãe fica vermelha se alguma parte dela estiver pendente.
 PENDENTES = {
-    "Sumário Executivo", "3. O que os dados mostram",
+    "Sumário Executivo", "3. Principais achados",
     "5. Oportunidades e priorização", "6. Mapa de agentes",
     "7. Fichas dos agentes: responsabilidades, limites e autonomia", "7.1 Sentinela de Entregas", "7.2 Voz do Cliente", "7.3 Copiloto Operacional",
     "8. Arquitetura conceitual", "8.1 Diagrama", "8.2 Fluxo das informações", "8.3 Governança, monitoramento e integrações futuras",
@@ -70,6 +70,8 @@ def build():
     K = {k["rank"]: k for k in o3["chave"]}
     meta = o2["meta"]
     fig = lambda n: config.FIGURES / f"{n}.png"  # noqa: E731
+    pct = lambda m, r, d=1: b.br_pct(V(o3, m, r), d)  # noqa: E731
+    dias = lambda m, r: b.br_num(V(o3, m, r), 1)  # noqa: E731
 
     doc = Document(str(b.make_template()))
     body_el = doc.element.body
@@ -91,124 +93,102 @@ def build():
     # ------------------------------------------------------------------ sumário executivo
     titulo(doc, "Sumário Executivo")
     b.body(doc, (
-        f"A Olist quer usar IA Generativa e Agentes de IA para melhorar sua operação e seus indicadores. Analisamos {b.br_int(I['I01']['valor'])} pedidos "
-        f"feitos de {I['I02']['texto']} e encontramos um eixo claro: a entrega. Com atraso, {b.br_pct(V(o3, 'M01', 'atrasados'), 0)} dos clientes "
-        f"dão nota 1 ou 2; no prazo, só {b.br_pct(V(o3, 'M01', 'no prazo'), 0)}. O atraso dá sinais antes de acontecer, porque se forma no transporte e na postagem "
-        "fora do prazo pelo vendedor. Ele também se concentra em rotas longas, no Norte e no Nordeste e em poucos meses de pico. Os comentários negativos, "
-        "com milhares de textos, falam principalmente de entrega e de produto."
+        f"Analisamos {b.br_int(I['I01']['valor'])} pedidos da Olist ({I['I02']['texto']}) e encontramos um eixo claro: a entrega. "
+        f"Com atraso, {pct('M01', 'atrasados')} dos clientes dão nota 1 ou 2; no prazo, {pct('M01', 'no prazo')}. O atraso dá sinais antes de acontecer, "
+        "porque se forma no transporte e na postagem fora do prazo pelo vendedor. Ele se concentra em rotas longas, no Norte e no Nordeste e em poucos "
+        "meses de pico. Os comentários negativos falam principalmente de entrega e de produto. Recomendamos três agentes, com aprovação humana nas ações "
+        "que afetam o cliente: um que previne o atraso, um que lê e encaminha as avaliações e um copiloto para os gestores."
     ))
-    b.body(doc, (
-        "Recomendamos começar por três agentes, com uma pessoa aprovando as ações que afetam o cliente:"
-    ))
-    b.bullet(doc, "**um agente que previne o atraso;**")
-    b.bullet(doc, "**um agente que lê e encaminha as avaliações;**")
-    b.bullet(doc, "**um copiloto que apoia as decisões dos gestores.**")
     afazer(doc, "OLIST-7", "Diogo", "Fechar o sumário (até 1 página) depois de prontos os agentes, os KPIs e o roadmap; incluir 3–5 números de destaque do OLIST-4.")
 
     # ------------------------------------------------------------------ 1
     titulo(doc, "1. Contexto, pergunta e escopo")
-    titulo(doc, "1.1 A Olist e seus desafios", 2)
     b.body(doc, (
-        "A Olist conecta pequenos e médios lojistas aos grandes marketplaces brasileiros. O enunciado do desafio lista oito frentes em que a empresa "
-        "quer melhorar:"
+        "A Olist conecta pequenos e médios lojistas aos grandes marketplaces brasileiros. Ela quer melhorar a experiência do cliente, a logística, "
+        "a retenção, a gestão de avaliações, a eficiência operacional, a automação, o apoio à decisão e a escalabilidade (FIAP, 2026). "
+        "A pergunta desta fase é: como a Olist poderia utilizar IA Generativa e Agentes de IA para melhorar sua operação e seus indicadores de negócio?"
     ))
-    b.bullet(doc, "experiência do cliente;")
-    b.bullet(doc, "eficiência logística;")
-    b.bullet(doc, "retenção e fidelização;")
-    b.bullet(doc, "gestão de avaliações;")
-    b.bullet(doc, "eficiência operacional;")
-    b.bullet(doc, "automação de processos;")
-    b.bullet(doc, "apoio à tomada de decisão;")
-    b.bullet(doc, "escalabilidade.")
-    b.body(doc, "Este relatório é o primeiro passo de uma estratégia de IA agêntica que será construída ao longo das cinco fases do curso (FIAP, 2026).")
-    titulo(doc, "1.2 A pergunta desta fase", 2)
-    b.body(doc, "Como a Olist poderia utilizar IA Generativa e Agentes de IA para melhorar sua operação e seus indicadores de negócio?")
-    titulo(doc, "1.3 Objetivos", 2)
-    for t in ["Identificar, com dados, onde estão os principais problemas e oportunidades da Olist.",
-              "Priorizar as oportunidades em que agentes de IA têm mais impacto.",
-              "Propor um mapa de pelo menos três agentes, a arquitetura conceitual e os prompts de cada um.",
-              "Definir os indicadores que vão medir o resultado e os riscos que precisam de controle."]:
-        b.bullet(doc, t)
-    titulo(doc, "1.4 Escopo", 2)
     b.body(doc, (
-        "Esta fase é de diagnóstico e desenho. Nada é implementado: não há modelagem de banco de dados, integração por API nem protótipo. "
-        "O monitoramento dos agentes aparece só como conceito na arquitetura. Os dados são públicos e vão de 2016 a 2018, então os achados são "
-        "hipóteses fortes a validar em piloto, e não relações de causa."
+        "O objetivo é identificar com dados onde estão os problemas, priorizar as oportunidades e propor agentes, arquitetura, prompts, indicadores e riscos. "
+        "Esta fase é de diagnóstico e desenho: nada é implementado (sem banco de dados, API ou protótipo), e o monitoramento dos agentes aparece só como conceito."
     ))
 
     # ------------------------------------------------------------------ 2
     titulo(doc, "2. Dados e método")
-    titulo(doc, "2.1 Fonte e período", 2)
     b.body(doc, (
-        f"Usamos o Brazilian E-Commerce Public Dataset by Olist (OLIST, 2018), indicado pelo enunciado. São {meta['tabelas']} tabelas: oito citadas no "
-        f"enunciado e uma de apoio. Elas cobrem {b.br_int(meta['pedidos'])} pedidos de {meta['clientes']:,} clientes".replace(",", ".") +
-        f", com compras de {I['I02']['texto']}. As análises foram feitas em Python, em notebooks reproduzíveis. "
-        "Cada número tem uma fórmula do Excel equivalente, que chegou ao mesmo valor."
+        f"Usamos o dataset público da Olist no Kaggle (OLIST, 2018): {meta['tabelas']} tabelas e {b.br_int(meta['pedidos'])} pedidos de "
+        f"{b.br_int(meta['clientes'])} clientes. As análises foram feitas em Python, e cada número tem uma fórmula do Excel equivalente, que chegou ao "
+        f"mesmo valor. Fizemos {len(o3['achados'])} análises, cobrindo as 8 dimensões do dataset. Como os dados são observacionais, os achados são "
+        "associações, não relações de causa. Antes de calcular qualquer número, aplicamos oito regras de qualidade (Tabela 1). O dicionário de dados está no Apêndice A."
     ))
-    titulo(doc, "2.2 Tabelas e o que cada linha representa", 2)
-    b.caption(doc, "Tabela 1. Tabelas do dataset, registros e granularidade.")
-    b.table(doc, ["Tabela", "Registros", "1 linha representa"],
-            [[r["tabela"], b.br_int(r["registros"]), r["granularidade"]] for r in o2["inventario"]], [3.4, 2.2, 10.4], size=8)
-    b.source(doc, "Fonte: Elaboração própria a partir do dataset Olist (Kaggle).")
-    b.body(doc, "O dicionário completo de tabelas e colunas está no Apêndice A.")
-    titulo(doc, "2.3 Regras de qualidade", 2)
-    b.body(doc, "Antes de calcular qualquer número, definimos oito regras que evitam erros de contagem comuns neste dataset (Tabela 2).")
-    b.caption(doc, "Tabela 2. Regras de qualidade aplicadas.")
-    b.table(doc, ["Regra", "Em linguagem simples", "Registros afetados"],
-            [[r["id"], r["regra"], b.br_int(r["afetados"])] for r in o2["regras"]], [1.4, 11.6, 3.0], size=8)
+    regras_curtas = {
+        "R1": "Pedido é contado pelo order_id, não pelas linhas de itens",
+        "R2": "Cliente é a pessoa (customer_unique_id), não o cadastro do pedido",
+        "R3": "Uma avaliação por pedido: a mais recente",
+        "R4": "Atraso só para pedidos entregues, com as datas preenchidas",
+        "R5": "Vazio continua vazio: nunca vira zero",
+        "R6": "Datas incoerentes ficam fora dos prazos",
+        "R7": "Geolocalização reduzida a 1 ponto por CEP",
+        "R8": "Valor do pedido = soma dos pagamentos",
+    }
+    b.caption(doc, "Tabela 1. Regras de qualidade aplicadas.")
+    b.table(doc, ["Regra", "O que garante", "Registros afetados"],
+            [[r["id"], regras_curtas[r["id"]], b.br_int(r["afetados"])] for r in o2["regras"]], [1.4, 11.0, 3.6], size=8)
     b.source(doc)
-    titulo(doc, "2.4 Como lemos os achados", 2)
-    b.body(doc, "Cada achado foi escrito em quatro partes:")
-    b.bullet(doc, "**fato:** o que os números mostram;")
-    b.bullet(doc, "**leitura:** o que o fato sugere;")
-    b.bullet(doc, "**cautela:** o limite da conclusão;")
-    b.bullet(doc, "**e daí?:** o que muda para a Olist.")
-    b.body(doc, (
-        f"Foram {len(o3['achados'])} análises, cobrindo as 8 dimensões do dataset. Como os dados são observacionais, o texto usa \"associado a\" e "
-        "\"compatível com\", nunca \"causa\"."
-    ))
 
     # ------------------------------------------------------------------ 3
-    titulo(doc, "3. O que os dados mostram")
+    titulo(doc, "3. Principais achados")
     afazer(doc, "OLIST-4", "Diogo", "Texto e números desta seção estão prontos. Falta trocar ou complementar as figuras pelos gráficos finais no padrão visual do relatório.")
-    secoes = [
-        ("3.1 Atraso e satisfação andam juntos", ["N1", "N2"], ("o3_n1_atraso_nota", "Percentual de notas 1 ou 2 por faixa de atraso.")),
-        ("3.2 O que dizem os comentários negativos", ["N3"], ("o3_n3_temas_comentarios", "Temas dos comentários de avaliações com nota 1 ou 2.")),
-        ("3.3 Em que etapa o atraso nasce", ["D1", "D2"], ("o3_d1_etapas_ciclo", "Tempo médio por etapa do ciclo do pedido.")),
-        ("3.4 Onde e quando o atraso acontece", ["N6", "D6", "D5"], ("o3_d5_sazonalidade", "Pedidos entregues e taxa de atraso por mês.")),
-        ("3.5 Produto, frete e forma de pagamento", ["D3", "D4"], None),
-    ]
-    n_fig, n_tab = 0, 2
-    for tit, ids, f in secoes:
-        titulo(doc, tit, 2)
-        for i in ids:
-            a = A[i]
-            b.rich(b._para(doc, indent=True), f"**{a['titulo']}.** {a['fato']} {a['leitura']}")
-            b.rich(b._para(doc, indent=True), f"*Cautela:* {a['cautela']} **E daí?** {a['e_dai']}".replace("*Cautela:*", "**Cautela:**"))
-        if f:
-            n_fig += 1
-            b.figure(doc, n_fig, f[1], fig(f[0]), 14.0)
-    titulo(doc, "3.6 Achados-chave", 2)
-    b.body(doc, "A Tabela 3 resume os seis achados que orientam as oportunidades e os agentes, em ordem de relevância.")
-    n_tab += 1
-    b.caption(doc, f"Tabela {n_tab}. Achados-chave e desafios do enunciado.")
-    b.table(doc, ["#", "Achado", "Evidência", "Desafios"],
+    b.body(doc, "A Tabela 2 reúne os achados mais relevantes, em ordem de importância para a escolha dos agentes. Em seguida, cada tema é resumido.")
+    b.caption(doc, "Tabela 2. Achados mais relevantes e desafios do enunciado.")
+    b.table(doc, ["#", "Achado", "Evidência nos dados", "Desafios"],
             [[k["rank"], k["titulo"], k["resumo"], k["desafios"]] for k in o3["chave"]], [0.7, 3.6, 7.6, 4.1], size=8)
     b.source(doc)
 
+    titulo(doc, "3.1 A entrega concentra a insatisfação", 2)
+    b.body(doc, (
+        f"Com atraso, {pct('M01', 'atrasados')} dos clientes dão nota 1 ou 2; no prazo, {pct('M01', 'no prazo')} (Figura 1). Os atrasados são "
+        f"{pct('M02', 'atrasados no total')} dos pedidos entregues, mas concentram {pct('M02', 'de atrasados')} das notas negativas. O atraso se forma no transporte: "
+        f"{dias('M07', 'transporte · atrasados')} dias nos atrasados, contra {dias('M07', 'transporte · no prazo')} nos demais, com um prazo prometido parecido "
+        f"para os dois grupos. Também dá sinal cedo: quando o vendedor posta depois do prazo-limite ({pct('M07', '% postou fora do limite')} dos pedidos), "
+        f"o atraso sobe de {pct('M07', 'atraso se postou no limite')} para {pct('M07', 'atraso se postou fora')}. "
+        f"Entre os vendedores com 50 ou mais entregas, {pct('M08', '% (50+ entregas) com 2× a média', 0)} atrasam o dobro da média ou mais."
+    ))
+    b.figure(doc, 1, "Percentual de notas 1 ou 2 por faixa de atraso.", fig("o3_n1_atraso_nota"), 12.0)
+
+    titulo(doc, "3.2 Onde e quando o atraso acontece", 2)
+    b.body(doc, (
+        f"O atraso é de {pct('M06', 'Nordeste')} no Nordeste e {pct('M06', 'Norte')} no Norte, contra {pct('M06', 'Sudeste')} no Sudeste. Quando vendedor e "
+        f"cliente estão em estados diferentes, {pct('M12', 'atraso · outra UF')}; no mesmo estado, {pct('M12', 'atraso · mesma UF')}. No tempo, há picos: "
+        f"{pct('M11', 'nov/2017')} na Black Friday de 2017 e {pct('M11', 'mar/2018')} em março de 2018, contra cerca de 4% nos meses normais (Figura 2). "
+        "Nesses meses, a nota média também cai."
+    ))
+    b.figure(doc, 2, "Pedidos entregues e taxa de atraso por mês.", fig("o3_d5_sazonalidade"), 13.0)
+
+    titulo(doc, "3.3 O que o cliente escreve", 2)
+    b.body(doc, (
+        f"Há {b.br_int(o3['comentarios_negativos'])} comentários em avaliações com nota 1 ou 2. Pela classificação por palavras-chave, "
+        f"{pct('M03', 'entrega (qualquer)', 0)} falam de entrega e {pct('M03', 'produto (qualquer)', 0)} de produto errado, incompleto ou com defeito. "
+        "É um volume de texto em português que hoje não tem leitura em escala, um caso típico para IA generativa."
+    ))
+
+    titulo(doc, "3.4 Outros sinais", 2)
+    b.body(doc, (
+        f"Pedidos acima de 10 kg atrasam {pct('M09', 'atraso · mais de 10 kg')}, contra {pct('M09', 'atraso · até 0,5 kg')} nos de até 0,5 kg. "
+        f"O peso do frete no valor quase não muda a nota (diferença de {b.br_num(V(o3, 'M10', 'diferença q1 − q5'))} ponto). "
+        f"Cancelamentos são raros ({pct('M04', 'cancelados + indisponíveis')}), mas {pct('M04', '% que já estava aprovado', 0)} deles acontecem depois do pagamento aprovado. "
+        f"A recompra é baixa ({pct('M05', 'recompra geral')}) e quase igual com nota boa ({pct('M05', '1ª compra nota 4-5')}) ou ruim "
+        f"({pct('M05', '1ª compra nota 1-2')}) na primeira compra, o que indica que retenção pede ação ativa."
+    ))
+
     # ------------------------------------------------------------------ 4
-    titulo(doc, "4. Análises complementares e limitações")
-    titulo(doc, "4.1 Cancelamentos e recompra", 2)
-    for i in ["N4", "N5"]:
-        a = A[i]
-        b.rich(b._para(doc, indent=True), f"**{a['titulo']}.** {a['fato']} {a['leitura']} **Cautela:** {a['cautela']}")
-    titulo(doc, "4.2 Limitações dos dados", 2)
-    for t in ["Os dados vão de 2016 a 2018; a operação atual pode ser diferente.",
-              "Não há custos internos, transportadora, motivo de cancelamento nem registros de atendimento.",
-              "Avaliações dependem de o cliente responder; comentários existem em só parte delas.",
-              "Os temas dos comentários foram classificados por palavras-chave, de forma aproximada.",
-              "Todos os achados são associações; o efeito real de cada agente só se mede em piloto."]:
-        b.bullet(doc, t)
+    titulo(doc, "4. Limitações")
+    b.body(doc, (
+        "Os dados vão de 2016 a 2018 e não trazem custos, transportadora, motivo de cancelamento nem registros de atendimento. As avaliações dependem de o "
+        "cliente responder, e os temas dos comentários foram classificados de forma aproximada. Por isso, os achados são hipóteses fortes, e o efeito de cada "
+        "agente só se mede em piloto."
+    ))
+    n_tab = 2
 
     # ------------------------------------------------------------------ 5
     titulo(doc, "5. Oportunidades e priorização")
@@ -344,11 +324,6 @@ def build():
     b.caption(doc, "Tabela A.1. Tabelas do dataset: o que é e para que serve.")
     b.table(doc, ["Tabela", "O que é", "Para que serve"],
             [[b.plain(b.re.sub(r"\s*\(.*?\)", "", r[0])).replace("**", ""), b.plain(r[1]), b.plain(r[4])] for r in overview], [3.2, 6.0, 6.8], size=8)
-    b.source(doc)
-    titulo(doc, "Apêndice B – Indicadores-base")
-    b.caption(doc, "Tabela B.1. Indicadores-base: fórmula, origem e valor.")
-    b.table(doc, ["ID", "Indicador", "Fórmula", "Origem", "Valor"],
-            [[i["id"], i["nome"], i["formula"], i["tabelas"], i["texto"]] for i in o2["indicadores"]], [1.0, 3.6, 6.4, 2.8, 2.2], size=8)
     b.source(doc)
 
     doc.save(OUT)
