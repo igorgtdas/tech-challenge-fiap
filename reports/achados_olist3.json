@@ -234,7 +234,11 @@
       "tabelas": "orders, order_reviews",
       "regras": "R3, R4, R6",
       "valor": 0.6241968343519825,
-      "texto": "62,4%"
+      "texto": "62,4%",
+      "valores": {
+        "atrasados": 0.6241968343519825,
+        "no prazo": 0.09257436815030194
+      }
     },
     {
       "id": "M02",
@@ -244,7 +248,12 @@
       "tabelas": "orders, order_reviews",
       "regras": "R3, R4, R6",
       "valor": 0.2748033669104457,
-      "texto": "27,5%"
+      "texto": "27,5%",
+      "valores": {
+        "de atrasados": 0.2748033669104457,
+        "de não entregues": 0.1540637505174555,
+        "atrasados no total": 0.06774705278546767
+      }
     },
     {
       "id": "M03",
@@ -254,7 +263,17 @@
       "tabelas": "order_reviews",
       "regras": "R3, R5",
       "valor": 0.45192840007381435,
-      "texto": "45,2%"
+      "texto": "45,2%",
+      "valores": {
+        "entrega (qualquer)": 0.45192840007381435,
+        "produto (qualquer)": 0.3157409116073076,
+        "Não recebeu o produto": 0.326997601033401,
+        "Atraso na entrega": 0.1825059974164975,
+        "Produto errado ou incompleto": 0.18794980623731317,
+        "Defeito ou qualidade": 0.14513747923971212,
+        "Atendimento e contato": 0.13480346927477393,
+        "Cancelamento, troca ou reemb": 0.14209263701789998
+      }
     },
     {
       "id": "M04",
@@ -264,7 +283,12 @@
       "tabelas": "orders",
       "regras": "R1",
       "valor": 0.012409368369183738,
-      "texto": "1,2%"
+      "texto": "1,2%",
+      "valores": {
+        "cancelados + indisponíveis": 0.012409368369183738,
+        "% indisponível entre eles": 0.49351701782820095,
+        "% que já estava aprovado": 0.8857374392220422
+      }
     },
     {
       "id": "M05",
@@ -274,7 +298,14 @@
       "tabelas": "orders, customers, order_reviews",
       "regras": "R1, R2, R3",
       "valor": 0.031187562437562436,
-      "texto": "3,1%"
+      "texto": "3,1%",
+      "valores": {
+        "recompra geral": 0.031187562437562436,
+        "1ª compra nota 4-5": 0.031222778745644598,
+        "1ª compra nota 1-2": 0.031078480290826146,
+        "1ª compra atrasada": 0.02553191489361702,
+        "2ª compra no mesmo dia": 0.3089756423089756
+      }
     },
     {
       "id": "M06",
@@ -284,7 +315,14 @@
       "tabelas": "orders, customers",
       "regras": "R2, R4, R6",
       "valor": 0.127156125608138,
-      "texto": "12,7%"
+      "texto": "12,7%",
+      "valores": {
+        "Nordeste": 0.127156125608138,
+        "Norte": 0.08574610244988864,
+        "Sudeste": 0.06117298596104151,
+        "Sul": 0.05901520637219406,
+        "Centro-Oeste": 0.06525604551920342
+      }
     },
     {
       "id": "M07",
@@ -294,7 +332,16 @@
       "tabelas": "orders, order_items",
       "regras": "R4, R6",
       "valor": 27.888366753405787,
-      "texto": "27,89 dias"
+      "texto": "27,89 dias",
+      "valores": {
+        "transporte · atrasados": 27.888366753405787,
+        "transporte · no prazo": 7.985122173656758,
+        "postagem · atrasados": 5.573905361806729,
+        "postagem · no prazo": 2.651688437785781,
+        "% postou fora do limite": 0.09016444435228003,
+        "atraso se postou fora": 0.20860165593376265,
+        "atraso se postou no limite": 0.05377777777777778
+      }
     },
     {
       "id": "M08",
@@ -304,7 +351,12 @@
       "tabelas": "order_items, sellers, orders",
       "regras": "R1, R4, R6",
       "valor": 97.0,
-      "texto": "97 vendedores"
+      "texto": "97 vendedores",
+      "valores": {
+        "vendedores com 50% dos atrasos": 97.0,
+        "vendedores com entrega": 2957.0,
+        "% (50+ entregas) com 2× a média": 0.0645933014354067
+      }
     },
     {
       "id": "M09",
@@ -314,7 +366,13 @@
       "tabelas": "products, order_items, orders, order_reviews",
       "regras": "R1, R4, R5, R6",
       "valor": 0.08869895536562203,
-      "texto": "8,9%"
+      "texto": "8,9%",
+      "valores": {
+        "atraso · mais de 10 kg": 0.08869895536562203,
+        "atraso · até 0,5 kg": 0.06526218193056557,
+        "nota · mais de 10 kg": 3.903219624377156,
+        "nota · até 0,5 kg": 4.192610429289006
+      }
     },
     {
       "id": "M10",
@@ -324,7 +382,13 @@
       "tabelas": "order_items, payments, order_reviews",
       "regras": "R3, R8",
       "valor": 0.09545086279050174,
-      "texto": "0,1 pontos"
+      "texto": "0,1 pontos",
+      "valores": {
+        "diferença q1 − q5": 0.09545086279050174,
+        "nota · menor frete": 4.204754158576901,
+        "nota · maior frete": 4.1093032957863995,
+        "cartão parcelado": 0.6797599199733244
+      }
     },
     {
       "id": "M11",
@@ -334,7 +398,12 @@
       "tabelas": "orders, order_reviews",
       "regras": "R3, R4, R6",
       "valor": 0.18963301442239042,
-      "texto": "19,0%"
+      "texto": "19,0%",
+      "valores": {
+        "mar/2018": 0.18963301442239042,
+        "fev/2018": 0.14126620900076278,
+        "nov/2017": 0.12403951701427003
+      }
     },
     {
       "id": "M12",
@@ -344,7 +413,14 @@
       "tabelas": "orders, customers, sellers, geolocation",
       "regras": "R4, R6, R7",
       "valor": 0.08047465639215813,
-      "texto": "8,0%"
+      "texto": "8,0%",
+      "valores": {
+        "atraso · outra UF": 0.08047465639215813,
+        "atraso · mesma UF": 0.04507440304533395,
+        "prazo · outra UF": 15.150100856388919,
+        "prazo · mesma UF": 7.944843407544123,
+        "% interestadual": 0.6404657480274141
+      }
     }
   ],
   "cobertura": [
