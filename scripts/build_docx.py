@@ -18,7 +18,7 @@ from pathlib import Path
 
 from docx import Document
 from docx.enum.table import WD_TABLE_ALIGNMENT
-from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK, WD_LINE_SPACING
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
@@ -32,6 +32,7 @@ ABNT = ROOT / "docs" / "abnt"
 TEMPLATE = ABNT / "template_fiap.docx"
 LOGO = ABNT / "assets" / "fiap_logo.png"
 OUT = ABNT / "OLIST-2_relatorio.docx"
+DICIONARIO = ROOT / "docs" / "dicionario_dados.md"
 
 HEADER_OLD = "Trabalho de Conclusão de Curso apresentado para obtenção do título de especialista em Data Science e Analytics – 2026"
 HEADER_NEW = "Tech Challenge · Pós-graduação em Agentic AI · Fase 1 – FIAP – 2026"
@@ -43,6 +44,9 @@ LOGO_HEIGHT_EMU = 298450  # mesma altura do logo original no cabeçalho
 def make_template():
     """Copia o modelo, troca o logo do cabeçalho (word/media/image3.png) e o texto do cabeçalho."""
     from PIL import Image  # vem com o matplotlib
+
+    if not SOURCE_TEMPLATE.exists():  # o modelo original não fica no repositório; o template FIAP já gerado basta
+        return TEMPLATE
 
     w, h = Image.open(LOGO).size
     cx = int(LOGO_HEIGHT_EMU * w / h)
@@ -193,6 +197,37 @@ def br_num(x, d=2):
     return f"{x:,.{d}f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
+def parse_dictionary(path=DICIONARIO):
+    """Lê docs/dicionario_dados.md: devolve (visão geral, [(tabela, subtítulo, linhas de colunas)])."""
+    def rows(block):
+        out = []
+        for line in block:
+            if line.startswith("|") and not line.startswith("|---"):
+                out.append([c.strip() for c in line.strip().strip("|").split("|")])
+        return out[1:]  # sem o cabeçalho
+
+    lines = path.read_text(encoding="utf-8").splitlines()
+    overview, tables, cur, sub, buf, mode = [], [], None, "", [], None
+    for line in lines + ["**fim**: fim"]:
+        m = re.match(r"^\*\*([a-z_]+)\*\*: (.+)$", line)
+        if line.startswith("### Visão geral"):
+            mode = "overview"
+        elif line.startswith("### Colunas"):
+            overview, buf, mode = rows(buf), [], "cols"
+        elif m and mode == "cols":
+            if cur:
+                tables.append((cur, sub, rows(buf)))
+            cur, sub, buf = m.group(1), m.group(2), []
+        elif mode:
+            buf.append(line)
+    return overview, tables
+
+
+def plain(md):
+    """Tira a marcação de código e itálico do Markdown (o negrito fica para o rich())."""
+    return re.sub(r"(?<!\*)\*(?!\*)([^*]+)(?<!\*)\*(?!\*)", lambda m: m.group(1), md.replace("`", ""))
+
+
 # ---------------------------------------------------------------- 3. relatório
 
 def build():
@@ -297,6 +332,10 @@ def build():
           [[r["tabela"], br_int(r["registros"]), r["chave"] + ("" if r["chave_e_unica"] == "sim" else " (repete)"), r["granularidade"]] for r in inv],
           [3.2, 2.0, 4.6, 6.2])
     source(doc, "Fonte: Elaboração própria a partir do dataset Olist (Kaggle).")
+    body(doc, (
+        "O que cada tabela representa, com quais outras se liga, para que serve na análise e o significado de cada uma das suas colunas "
+        "estão no dicionário de dados do Apêndice A."
+    ))
     body(doc, (
         "O trabalho foi feito em Python 3.13, com as bibliotecas pandas e NumPy para os cálculos (MCKINNEY, 2010; HARRIS et al., 2020), Matplotlib para os gráficos "
         "(HUNTER, 2007) e XlsxWriter para a planilha. Todo o processo está em um único notebook Jupyter, organizado em etapas com explicações em texto. "
@@ -448,6 +487,27 @@ def build():
     for ref in refs:
         p = _para(doc, align=WD_ALIGN_PARAGRAPH.LEFT, line=1.0, after=12)
         _font(p.add_run(ref), 11)
+
+    # Apêndice A: dicionário de dados
+    overview, dict_tables = parse_dictionary()
+    p = _para(doc, align=WD_ALIGN_PARAGRAPH.LEFT)
+    p.add_run().add_break(WD_BREAK.PAGE)
+    heading(doc, "Apêndice A – Dicionário de dados")
+    body(doc, (
+        "Este apêndice descreve as tabelas do dataset Olist e todas as suas colunas. A Tabela A.1 resume o que cada tabela é e para que serve. "
+        "As Tabelas A.2 a A.10 descrevem as colunas. Os identificadores (colunas terminadas em _id) foram anonimizados pela Olist "
+        "e servem apenas para ligar as tabelas."
+    ))
+    caption(doc, "Tabela A.1. Visão geral das tabelas: o que é, granularidade, ligações e uso na análise.")
+    table(doc, ["Tabela", "O que é", "1 linha representa", "Liga com", "Para que serve"],
+          [[plain(re.sub(r"\s*\(.*?\)", "", r[0])).replace("**", ""), plain(r[1]), plain(r[2]), plain(r[3]), plain(r[4])] for r in overview],
+          [2.6, 3.8, 2.8, 2.8, 4.0], size=8)
+    source(doc, "Fonte: Elaboração própria a partir do dataset Olist (Kaggle).")
+    for k, (nome, sub, cols) in enumerate(dict_tables, start=2):
+        arquivo = config.TABLES[nome]["file"]
+        caption(doc, f"Tabela A.{k}. Colunas da tabela {nome} ({sub}), arquivo {arquivo}.")
+        table(doc, ["Coluna", "Descrição"], [[plain(c[0]), plain(c[1]).replace("**", "")] for c in cols], [5.2, 10.8], size=8)
+        source(doc, "Fonte: Elaboração própria a partir do dataset Olist (Kaggle).")
 
     doc.save(OUT)
     print("Word:", OUT)

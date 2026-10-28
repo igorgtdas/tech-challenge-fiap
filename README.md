@@ -31,6 +31,7 @@ Case FIAP/
 │  └─ indicadores.json       números para o Word e o Confluence
 ├─ docs/
 │  ├─ case/                  enunciado, plano de execução e cronograma da sprint
+│  ├─ dicionario_dados.md    o que é cada tabela e coluna do dataset (usado no Word)
 │  └─ abnt/                  template FIAP (ABNT) e relatórios em Word
 └─ fases/                    esqueleto das fases 2 a 5 (ainda não iniciadas)
 ```
