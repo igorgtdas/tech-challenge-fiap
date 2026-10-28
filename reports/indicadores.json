@@ -1,0 +1,498 @@
+{
+  "meta": {
+    "pedidos": 99441,
+    "inicio": "2016-09-04",
+    "fim": "2018-10-17",
+    "meses_de_borda": [
+      "2016-09",
+      "2016-10",
+      "2016-12",
+      "2018-09",
+      "2018-10"
+    ],
+    "clientes": 96096,
+    "entregues_validos": 96447,
+    "tabelas": 9,
+    "integridade": [
+      {
+        "ligacao": "orders → order_items (pedidos com item)",
+        "valores": 99441,
+        "encontrados": 98666,
+        "pct_encontrado": 0.9922064339658692
+      },
+      {
+        "ligacao": "orders → order_reviews (pedidos com avaliação)",
+        "valores": 99441,
+        "encontrados": 98673,
+        "pct_encontrado": 0.9922768274655324
+      },
+      {
+        "ligacao": "customers.customer_zip_code_prefix → geolocation",
+        "valores": 99441,
+        "encontrados": 99163,
+        "pct_encontrado": 0.9972043724419505
+      },
+      {
+        "ligacao": "sellers.seller_zip_code_prefix → geolocation",
+        "valores": 3095,
+        "encontrados": 3088,
+        "pct_encontrado": 0.9977382875605816
+      },
+      {
+        "ligacao": "products.product_category_name → category_translation",
+        "valores": 32341,
+        "encontrados": 32328,
+        "pct_encontrado": 0.9995980334559846
+      },
+      {
+        "ligacao": "orders → payments (pedidos com pagamento)",
+        "valores": 99441,
+        "encontrados": 99440,
+        "pct_encontrado": 0.9999899437857624
+      },
+      {
+        "ligacao": "orders.customer_id → customers",
+        "valores": 99441,
+        "encontrados": 99441,
+        "pct_encontrado": 1.0
+      },
+      {
+        "ligacao": "order_items.order_id → orders",
+        "valores": 112650,
+        "encontrados": 112650,
+        "pct_encontrado": 1.0
+      },
+      {
+        "ligacao": "payments.order_id → orders",
+        "valores": 103886,
+        "encontrados": 103886,
+        "pct_encontrado": 1.0
+      },
+      {
+        "ligacao": "order_reviews.order_id → orders",
+        "valores": 99224,
+        "encontrados": 99224,
+        "pct_encontrado": 1.0
+      },
+      {
+        "ligacao": "order_items.product_id → products",
+        "valores": 112650,
+        "encontrados": 112650,
+        "pct_encontrado": 1.0
+      },
+      {
+        "ligacao": "order_items.seller_id → sellers",
+        "valores": 112650,
+        "encontrados": 112650,
+        "pct_encontrado": 1.0
+      }
+    ],
+    "granularidade": [
+      {
+        "tabela": "orders",
+        "entidade": "pedido",
+        "linhas": 99441,
+        "entidades_distintas": 99441,
+        "linhas_por_entidade": 1.0
+      },
+      {
+        "tabela": "products",
+        "entidade": "produto",
+        "linhas": 32951,
+        "entidades_distintas": 32951,
+        "linhas_por_entidade": 1.0
+      },
+      {
+        "tabela": "sellers",
+        "entidade": "vendedor",
+        "linhas": 3095,
+        "entidades_distintas": 3095,
+        "linhas_por_entidade": 1.0
+      },
+      {
+        "tabela": "category_translation",
+        "entidade": "categoria",
+        "linhas": 71,
+        "entidades_distintas": 71,
+        "linhas_por_entidade": 1.0
+      },
+      {
+        "tabela": "order_reviews",
+        "entidade": "pedido",
+        "linhas": 99224,
+        "entidades_distintas": 98673,
+        "linhas_por_entidade": 1.0055841010205426
+      },
+      {
+        "tabela": "customers",
+        "entidade": "cliente real",
+        "linhas": 99441,
+        "entidades_distintas": 96096,
+        "linhas_por_entidade": 1.0348089410589412
+      },
+      {
+        "tabela": "payments",
+        "entidade": "pedido",
+        "linhas": 103886,
+        "entidades_distintas": 99440,
+        "linhas_por_entidade": 1.0447103781174578
+      },
+      {
+        "tabela": "order_items",
+        "entidade": "pedido",
+        "linhas": 112650,
+        "entidades_distintas": 98666,
+        "linhas_por_entidade": 1.1417306873695092
+      },
+      {
+        "tabela": "geolocation",
+        "entidade": "prefixo de CEP",
+        "linhas": 1000163,
+        "entidades_distintas": 19015,
+        "linhas_por_entidade": 52.598632658427555
+      }
+    ]
+  },
+  "indicadores": [
+    {
+      "id": "I01",
+      "nome": "Pedidos totais",
+      "definicao": "Quantidade de pedidos distintos no dataset.",
+      "formula": "Contagem de order_id distintos da tabela orders.",
+      "tabelas": "orders",
+      "regras": "R1",
+      "valor": 99441,
+      "unidade": "pedidos",
+      "texto": "99.441 pedidos"
+    },
+    {
+      "id": "I02",
+      "nome": "Período coberto",
+      "definicao": "Primeira e última data de compra registradas.",
+      "formula": "Menor e maior data de compra (order_purchase_timestamp).",
+      "tabelas": "orders",
+      "regras": "—",
+      "valor": "04/09/2016 a 17/10/2018",
+      "unidade": "",
+      "texto": "04/09/2016 a 17/10/2018"
+    },
+    {
+      "id": "I03",
+      "nome": "% de pedidos entregues válidos",
+      "definicao": "Parte dos pedidos entregues com datas confiáveis para medir prazo e atraso.",
+      "formula": "Pedidos entregues válidos ÷ pedidos totais.",
+      "tabelas": "orders",
+      "regras": "R1, R4, R6",
+      "valor": 0.9698916945726612,
+      "unidade": "%",
+      "texto": "97,0%"
+    },
+    {
+      "id": "I04",
+      "nome": "Prazo médio de entrega",
+      "definicao": "Tempo médio entre a compra e a entrega ao cliente.",
+      "formula": "Média de (data de entrega − data de compra), em dias, só para pedidos entregues válidos.",
+      "tabelas": "orders",
+      "regras": "R4, R6",
+      "valor": 12.559564009248604,
+      "unidade": "dias",
+      "texto": "12,56 dias"
+    },
+    {
+      "id": "I05",
+      "nome": "Taxa de atraso",
+      "definicao": "Parte dos pedidos entregues que chegaram depois do dia prometido ao cliente.",
+      "formula": "Pedidos entregues após a data prometida ÷ pedidos entregues válidos.",
+      "tabelas": "orders",
+      "regras": "R4, R6",
+      "valor": 0.06774705278546767,
+      "unidade": "%",
+      "texto": "6,8%"
+    },
+    {
+      "id": "I06",
+      "nome": "Atraso médio dos atrasados",
+      "definicao": "Dias além da data prometida, em média, quando o pedido atrasa.",
+      "formula": "Média de (data de entrega − data prometida), em dias, só nos pedidos atrasados.",
+      "tabelas": "orders",
+      "regras": "R4, R6",
+      "valor": 10.620140801958984,
+      "unidade": "dias",
+      "texto": "10,62 dias"
+    },
+    {
+      "id": "I07",
+      "nome": "Nota média de avaliação",
+      "definicao": "Média das notas de 1 a 5 dadas pelos clientes.",
+      "formula": "Média de review_score, com uma avaliação por pedido (a mais recente).",
+      "tabelas": "order_reviews, orders",
+      "regras": "R3, R5",
+      "valor": 4.086386346822333,
+      "unidade": "(1 a 5)",
+      "texto": "4,09 (1 a 5)"
+    },
+    {
+      "id": "I08",
+      "nome": "% de avaliações negativas (nota 1–2)",
+      "definicao": "Parte dos pedidos avaliados com nota 1 ou 2; a aba traz a distribuição das 5 notas.",
+      "formula": "Pedidos com nota 1 ou 2 ÷ pedidos avaliados.",
+      "tabelas": "order_reviews, orders",
+      "regras": "R3, R5",
+      "valor": 0.1468892199487195,
+      "unidade": "%",
+      "texto": "14,7%"
+    },
+    {
+      "id": "I09",
+      "nome": "Queda de nota com atraso",
+      "definicao": "Diferença entre a nota média dos pedidos entregues no prazo e a dos entregues com atraso.",
+      "formula": "Nota média (entregues no prazo) − nota média (entregues com atraso).",
+      "tabelas": "orders, order_reviews",
+      "regras": "R3, R4, R6",
+      "valor": 2.0202833573628878,
+      "unidade": "pontos",
+      "texto": "2,02 pontos"
+    },
+    {
+      "id": "I10",
+      "nome": "% de avaliações com comentário",
+      "definicao": "Parte dos pedidos avaliados em que o cliente escreveu um comentário.",
+      "formula": "Avaliações com comentário preenchido ÷ pedidos avaliados.",
+      "tabelas": "order_reviews",
+      "regras": "R3, R5",
+      "valor": 0.41295997892027203,
+      "unidade": "%",
+      "texto": "41,3%"
+    },
+    {
+      "id": "I11",
+      "nome": "% de pedidos cancelados ou indisponíveis",
+      "definicao": "Parte dos pedidos que não se concretizaram por cancelamento ou indisponibilidade.",
+      "formula": "Pedidos com status canceled ou unavailable ÷ pedidos totais.",
+      "tabelas": "orders",
+      "regras": "R1",
+      "valor": 0.012409368369183738,
+      "unidade": "%",
+      "texto": "1,2%"
+    },
+    {
+      "id": "I12",
+      "nome": "Taxa de recompra",
+      "definicao": "Parte dos clientes (pessoas) que fizeram dois ou mais pedidos no período.",
+      "formula": "Clientes com 2 ou mais pedidos ÷ total de clientes (customer_unique_id).",
+      "tabelas": "orders, customers",
+      "regras": "R1, R2",
+      "valor": 0.031187562437562436,
+      "unidade": "%",
+      "texto": "3,1%"
+    },
+    {
+      "id": "I13",
+      "nome": "Ticket médio",
+      "definicao": "Valor médio pago por pedido (inclui frete e eventuais juros).",
+      "formula": "Média, entre os pedidos, da soma dos pagamentos de cada pedido.",
+      "tabelas": "payments, orders",
+      "regras": "R1, R8",
+      "valor": 160.9902666934835,
+      "unidade": "R$",
+      "texto": "R$ 160,99"
+    },
+    {
+      "id": "I14",
+      "nome": "Peso do frete no valor",
+      "definicao": "Parte do valor total dos itens (preço + frete) que corresponde ao frete.",
+      "formula": "Soma do frete ÷ (soma dos preços + soma do frete).",
+      "tabelas": "order_items",
+      "regras": "R1, R8",
+      "valor": 0.1421341226862315,
+      "unidade": "%",
+      "texto": "14,2%"
+    },
+    {
+      "id": "I15",
+      "nome": "Maior taxa de atraso por UF",
+      "definicao": "Taxa de atraso por estado do cliente; o valor é a maior entre os estados com 500+ entregas (MA).",
+      "formula": "Por UF: pedidos atrasados ÷ pedidos entregues válidos; valor = maior taxa entre UFs com 500+ entregas.",
+      "tabelas": "orders, customers",
+      "regras": "R2, R4, R6",
+      "valor": 0.17433751743375175,
+      "unidade": "%",
+      "texto": "17,4%"
+    }
+  ],
+  "regras": [
+    {
+      "id": "R1",
+      "regra": "Pedido se conta pelo order_id da tabela orders, nunca pelas linhas de itens ou pagamentos.",
+      "motivo": "Contar linhas de order_items infla o número de pedidos em 14,2%.",
+      "afetados": 13984,
+      "base": "112.650 linhas de itens",
+      "ok": true,
+      "evidencia": "orders: 99.441 linhas e nenhum order_id repetido; order_items: 112.650 linhas para 98.666 pedidos."
+    },
+    {
+      "id": "R2",
+      "regra": "Cliente se conta pelo customer_unique_id (a pessoa), não pelo customer_id (o cadastro de cada pedido).",
+      "motivo": "Por customer_id seriam 99.441 clientes; na verdade são 96.096 pessoas.",
+      "afetados": 3345,
+      "base": "99.441 customer_id",
+      "ok": true,
+      "evidencia": "Cada customer_id aparece em exatamente 1 pedido; 3.345 cadastros são de pessoas que já tinham comprado."
+    },
+    {
+      "id": "R3",
+      "regra": "Cada pedido fica com uma única avaliação: a mais recente.",
+      "motivo": "547 pedidos têm mais de uma avaliação e 814 review_id se repetem em pedidos diferentes.",
+      "afetados": 551,
+      "base": "99.224 avaliações",
+      "ok": true,
+      "evidencia": "99.224 avaliações viraram 98.673, exatamente 1 por pedido avaliado."
+    },
+    {
+      "id": "R4",
+      "regra": "Prazo e atraso só são calculados para pedidos com status delivered e com data de entrega e data prometida preenchidas.",
+      "motivo": "2.963 pedidos não foram entregues e 8 estão como entregues sem data de entrega.",
+      "afetados": 2971,
+      "base": "99.441 pedidos",
+      "ok": true,
+      "evidencia": "96.470 pedidos entram no cálculo de prazo (antes da R6)."
+    },
+    {
+      "id": "R5",
+      "regra": "Valor ausente continua ausente: nunca é trocado por zero nem por média; o indicador declara sobre quantos registros foi calculado.",
+      "motivo": "768 pedidos não têm avaliação e 2 produtos não têm peso ou medida.",
+      "afetados": 770,
+      "base": "pedidos sem avaliação + produtos sem medida",
+      "ok": true,
+      "evidencia": "Nenhum fillna é usado; a base de pedidos mantém células vazias onde não há dado."
+    },
+    {
+      "id": "R6",
+      "regra": "Pedido com data de entrega anterior à compra ou à postagem não entra nos cálculos de prazo e atraso.",
+      "motivo": "23 pedidos têm a entrega registrada antes da compra ou da postagem.",
+      "afetados": 23,
+      "base": "96.470 pedidos entregues com datas",
+      "ok": true,
+      "evidencia": "Também há 166 postagens registradas antes da compra (apenas sinalizadas, pois não entram nos indicadores)."
+    },
+    {
+      "id": "R7",
+      "regra": "Antes de cruzar, a geolocalização é reduzida a 1 linha por prefixo de CEP (mediana das coordenadas dentro do Brasil).",
+      "motivo": "1.000.163 linhas para 19.015 CEPs; 42 coordenadas fora do Brasil.",
+      "afetados": 981153,
+      "base": "1.000.163 linhas de geolocalização",
+      "ok": true,
+      "evidencia": "19.010 CEPs únicos; 99,7% dos clientes encontram seu CEP."
+    },
+    {
+      "id": "R8",
+      "regra": "Valor do pedido é a soma dos pagamentos do pedido; a soma de preço + frete dos itens serve de conferência.",
+      "motivo": "249 pedidos (0,3%) têm diferença acima de R$ 1 entre pago e itens + frete.",
+      "afetados": 249,
+      "base": "98.665 pedidos com itens e pagamento",
+      "ok": true,
+      "evidencia": "Diferenças ficam declaradas, não corrigidas; 1 pedido(s) sem registro de pagamento."
+    }
+  ],
+  "inventario": [
+    {
+      "tabela": "geolocation",
+      "no_enunciado": "sim",
+      "registros": 1000163,
+      "colunas": 5,
+      "chave": "geolocation_zip_code_prefix",
+      "chave_e_unica": "não",
+      "granularidade": "1 linha por ponto de coordenada (o mesmo CEP aparece várias vezes)",
+      "pct_celulas_vazias": 0.0,
+      "memoria_MB": 181.7
+    },
+    {
+      "tabela": "order_items",
+      "no_enunciado": "sim",
+      "registros": 112650,
+      "colunas": 7,
+      "chave": "order_id + order_item_id",
+      "chave_e_unica": "sim",
+      "granularidade": "1 linha por item dentro do pedido",
+      "pct_celulas_vazias": 0.0,
+      "memoria_MB": 31.0
+    },
+    {
+      "tabela": "payments",
+      "no_enunciado": "sim",
+      "registros": 103886,
+      "colunas": 5,
+      "chave": "order_id + payment_sequential",
+      "chave_e_unica": "sim",
+      "granularidade": "1 linha por forma de pagamento usada no pedido",
+      "pct_celulas_vazias": 0.0,
+      "memoria_MB": 17.0
+    },
+    {
+      "tabela": "customers",
+      "no_enunciado": "sim",
+      "registros": 99441,
+      "colunas": 5,
+      "chave": "customer_id",
+      "chave_e_unica": "sim",
+      "granularidade": "1 linha por cliente-em-um-pedido (o mesmo cliente real recebe um customer_id novo a cada pedido)",
+      "pct_celulas_vazias": 0.0,
+      "memoria_MB": 32.5
+    },
+    {
+      "tabela": "orders",
+      "no_enunciado": "sim",
+      "registros": 99441,
+      "colunas": 8,
+      "chave": "order_id",
+      "chave_e_unica": "sim",
+      "granularidade": "1 linha por pedido",
+      "pct_celulas_vazias": 0.0062,
+      "memoria_MB": 25.9
+    },
+    {
+      "tabela": "order_reviews",
+      "no_enunciado": "sim",
+      "registros": 99224,
+      "colunas": 7,
+      "chave": "review_id + order_id",
+      "chave_e_unica": "sim",
+      "granularidade": "1 linha por avaliação ligada a um pedido (há pedidos com mais de uma)",
+      "pct_celulas_vazias": 0.2101,
+      "memoria_MB": 29.1
+    },
+    {
+      "tabela": "products",
+      "no_enunciado": "sim",
+      "registros": 32951,
+      "colunas": 9,
+      "chave": "product_id",
+      "chave_e_unica": "sim",
+      "granularidade": "1 linha por produto",
+      "pct_celulas_vazias": 0.0083,
+      "memoria_MB": 6.6
+    },
+    {
+      "tabela": "sellers",
+      "no_enunciado": "sim",
+      "registros": 3095,
+      "colunas": 4,
+      "chave": "seller_id",
+      "chave_e_unica": "sim",
+      "granularidade": "1 linha por vendedor",
+      "pct_celulas_vazias": 0.0,
+      "memoria_MB": 0.8
+    },
+    {
+      "tabela": "category_translation",
+      "no_enunciado": "apoio",
+      "registros": 71,
+      "colunas": 2,
+      "chave": "product_category_name",
+      "chave_e_unica": "sim",
+      "granularidade": "1 linha por categoria (tradução para inglês)",
+      "pct_celulas_vazias": 0.0,
+      "memoria_MB": 0.0
+    }
+  ]
+}

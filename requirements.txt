@@ -1,0 +1,15 @@
+# Análise (Fase 1 · OLIST-2)
+pandas
+numpy
+matplotlib
+seaborn
+
+# Saídas: Excel com fórmulas vivas e Word ABNT
+xlsxwriter
+openpyxl
+python-docx
+
+# Notebook
+jupyter
+ipykernel
+nbconvert

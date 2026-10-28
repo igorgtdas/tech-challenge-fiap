@@ -1,0 +1,1088 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Sprint Olist Fase 1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: cabeçalho de sprint → filtros → Gantt rolável (coluna de tarefa fixa) → painel da tarefa → bloqueios + carga lado a lado */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --ink: #1b2230;
+  --muted: #5d6779;
+  --line: #dde1e8;
+  --weekend: #eceff4;
+  --holiday: #f3ece4;
+  --deliver: #fbe9e4;
+  --dados: #0f7f73;
+  --agentes: #3b4fc4;
+  --estrategia: #b06a12;
+  --todos: #4b5465;
+  --block: #c8352a;
+  --block-soft: #fbe3e0;
+  --ok: #1d7a43;
+  --ok-soft: #e2f3e8;
+  --on-bar: #ffffff;
+  --focus: #3b4fc4;
+  --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --namecol: 236px;
+  --daycol: minmax(70px, 1fr);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161d; --surface: #1a1f28; --ink: #e6e9ef; --muted: #9aa3b4; --line: #2c3340;
+    --weekend: #1f2531; --holiday: #2a2520; --deliver: #36211f;
+    --dados: #2bb3a3; --agentes: #7d8cf0; --estrategia: #e09a3c; --todos: #8b94a6;
+    --block: #ff6b5e; --block-soft: #3a2220; --on-bar: #10141a; --focus: #7d8cf0;
+    --ok: #4cc27a; --ok-soft: #1b3325;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161d; --surface: #1a1f28; --ink: #e6e9ef; --muted: #9aa3b4; --line: #2c3340;
+  --weekend: #1f2531; --holiday: #2a2520; --deliver: #36211f;
+  --dados: #2bb3a3; --agentes: #7d8cf0; --estrategia: #e09a3c; --todos: #8b94a6;
+  --block: #ff6b5e; --block-soft: #3a2220; --on-bar: #10141a; --focus: #7d8cf0;
+  --ok: #4cc27a; --ok-soft: #1b3325;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 28px;
+}
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(28px, 4.2vw, 42px); font-stretch: 82%; font-weight: 800; letter-spacing: -0.01em; line-height: 1.05; }
+h2 { font-size: 21px; font-stretch: 88%; font-weight: 700; }
+h3 { font-size: 16px; font-weight: 700; font-stretch: 92%; }
+p { margin: 0; }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+/* Cabeçalho */
+header.top { display: grid; gap: 14px; }
+.meta { display: flex; flex-wrap: wrap; gap: 10px 28px; color: var(--muted); font-size: 14px; }
+.meta b { color: var(--ink); font-weight: 600; }
+.lede { max-width: 68ch; color: var(--muted); }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.stat { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 10px 14px; display: grid; gap: 2px; min-width: 150px; }
+.stat strong { font-family: var(--f-display); font-size: 24px; font-stretch: 85%; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 13px; color: var(--muted); }
+.stat.alert strong { color: var(--block); }
+
+/* Filtros e legenda */
+.controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font: 500 14px/1 var(--f-body);
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  border-radius: 999px; padding: 8px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+}
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip .dot { width: 10px; height: 10px; border-radius: 50%; }
+.chip:focus-visible, .row:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--muted); align-items: center; }
+.legend i { display: inline-block; vertical-align: -2px; margin-right: 6px; }
+.lg-bar { width: 22px; height: 12px; border-radius: 3px; background: var(--todos); }
+.lg-draft { width: 22px; height: 12px; border-radius: 3px; border: 1.5px dashed var(--todos); background: repeating-linear-gradient(135deg, transparent 0 4px, color-mix(in srgb, var(--todos) 30%, transparent) 4px 7px); }
+.lg-ms { width: 11px; height: 11px; background: var(--ink); transform: rotate(45deg); }
+.lg-block { width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 12px solid var(--block); }
+
+/* Gantt */
+.gantt-box { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); overflow-x: auto; }
+.gantt { min-width: calc(var(--namecol) + 9 * 70px); }
+.grid { display: grid; grid-template-columns: var(--namecol) repeat(9, var(--daycol)); }
+.head { position: sticky; top: 0; z-index: 3; background: var(--surface); border-bottom: 1px solid var(--line); }
+.hcell { padding: 10px 8px 8px; border-left: 1px solid var(--line); display: grid; gap: 1px; align-content: start; }
+.hcell .d { font-family: var(--f-display); font-size: 18px; font-weight: 700; font-stretch: 85%; font-variant-numeric: tabular-nums; }
+.hcell .w { font-size: 12px; color: var(--muted); }
+.hcell .tag { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.hcell.deliver .tag, .hcell.deliver .d { color: var(--block); }
+.hname { padding: 10px 14px; font-size: 12px; color: var(--muted); display: flex; align-items: end; position: sticky; left: 0; background: var(--surface); z-index: 2; }
+
+.row { position: relative; cursor: pointer; border-bottom: 1px solid var(--line); transition: opacity .15s; }
+.row:last-child { border-bottom: 0; }
+.row .name {
+  grid-row: 1; grid-column: 1; position: sticky; left: 0; z-index: 2; background: var(--surface);
+  padding: 9px 12px 9px 14px; display: grid; gap: 3px; min-width: 0; border-right: 1px solid var(--line);
+  border-left: 4px solid var(--c);
+}
+.row .name .t { font-weight: 600; font-size: 14px; line-height: 1.3; }
+.row .name .s { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); }
+.row .day { grid-row: 1; border-left: 1px solid var(--line); min-height: 58px; }
+.day.weekend { background: var(--weekend); }
+.day.holiday { background: var(--holiday); }
+.day.deliver { background: var(--deliver); }
+.seg {
+  grid-row: 1; align-self: center; z-index: 1; margin: 0 5px; min-height: 30px;
+  border-radius: 5px; background: var(--c); color: var(--on-bar);
+  font-size: 12px; font-weight: 600; padding: 5px 8px; line-height: 1.25;
+  display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0;
+}
+.seg span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.seg.draft {
+  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--c) 16%, var(--surface)) 0 6px, color-mix(in srgb, var(--c) 30%, var(--surface)) 6px 11px);
+  color: var(--ink); border: 1.5px dashed var(--c);
+}
+.seg .tri { flex: none; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 10px solid var(--block); filter: drop-shadow(0 0 1px var(--surface)); }
+.ms { grid-row: 1; align-self: center; justify-self: center; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px; }
+.ms .dia { width: 14px; height: 14px; background: var(--ink); transform: rotate(45deg); }
+.ms .when { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); }
+.row.milestone .name { border-left-color: var(--ink); }
+.row.is-related { opacity: 1; }
+.gantt.focusing .row:not(.is-related) { opacity: .28; }
+.row.is-selected .name { box-shadow: inset 0 0 0 2px var(--focus); }
+
+.pill { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase; border-radius: 4px; padding: 2px 6px; border: 1px solid var(--line); color: var(--muted); }
+.pill.alta { background: var(--block-soft); color: var(--block); border-color: color-mix(in srgb, var(--block) 40%, transparent); font-weight: 500; }
+.code { font-family: var(--f-mono); font-size: 11.5px; }
+
+.foot .name { font-size: 12px; color: var(--muted); padding: 10px 14px; }
+.foot .cnt { grid-row: 1; border-left: 1px solid var(--line); padding: 8px; display: flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.foot .cnt b { font-family: var(--f-display); font-size: 18px; font-stretch: 85%; }
+.foot .meter { flex: 1; height: 6px; border-radius: 3px; background: var(--weekend); overflow: hidden; }
+.foot .meter i { display: block; height: 100%; background: var(--muted); border-radius: 3px; }
+.foot { border-top: 1px solid var(--line); }
+.scroll-hint { font-size: 12px; color: var(--muted); padding: 8px 14px 0; display: none; }
+@media (max-width: 900px) { .scroll-hint { display: block; } :root { --namecol: 190px; } }
+
+/* Painel da tarefa */
+.detail { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 20px; display: grid; gap: 16px; border-top: 4px solid var(--c, var(--ink)); }
+.detail-head { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: baseline; justify-content: space-between; }
+.detail-head .who { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+.detail-cols { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 20px; }
+.detail-cols > div { min-width: 0; display: grid; gap: 8px; align-content: start; }
+.detail ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.rel { list-style: none; padding: 0 !important; }
+.rel li { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.rel .kind { font-family: var(--f-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); }
+.rel .kind.hard { color: var(--block); border-color: color-mix(in srgb, var(--block) 40%, transparent); background: var(--block-soft); }
+.rel button { all: unset; cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.rel button:hover { text-decoration-color: var(--ink); }
+.empty { color: var(--muted); font-size: 14px; }
+.hint { font-size: 13px; color: var(--muted); }
+.clear { font: 500 13px var(--f-body); border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+
+/* Bloqueios e carga */
+.two { display: grid; grid-template-columns: 1.45fr 1fr; gap: 20px; align-items: start; }
+.two > section { min-width: 0; display: grid; gap: 12px; }
+.blocks { display: grid; gap: 10px; }
+.bk { border: 1px solid var(--line); border-left: 4px solid var(--block); border-radius: 8px; background: var(--surface); padding: 12px 14px; display: grid; gap: 6px; }
+.bk-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 12px; align-items: baseline; }
+.bk-top b { font-weight: 600; }
+.bk .due { font-family: var(--f-mono); font-size: 12.5px; color: var(--block); font-weight: 500; white-space: nowrap; }
+.bk .flow { font-size: 13.5px; color: var(--muted); }
+.bk .mit { font-size: 13.5px; }
+.bk .mit::before { content: "Como reduzir: "; font-weight: 600; }
+.load { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 16px; display: grid; gap: 16px; }
+.lp { display: grid; gap: 6px; }
+.lp-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.lp-top b { font-weight: 600; }
+.lp-top .h { font-family: var(--f-display); font-size: 20px; font-stretch: 85%; font-variant-numeric: tabular-nums; }
+.lp .bar { height: 10px; border-radius: 5px; background: var(--weekend); overflow: hidden; }
+.lp .bar i { display: block; height: 100%; background: var(--c); border-radius: 5px; }
+.lp .cards { font-size: 12.5px; color: var(--muted); }
+.days { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; }
+.days i { height: 8px; border-radius: 2px; background: var(--weekend); }
+.days i.on { background: var(--c); }
+.note { font-size: 13px; color: var(--muted); }
+
+/* Responsáveis */
+.team { display: grid; gap: 8px; }
+.team-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tm { display: grid; gap: 4px; border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 8px; background: var(--surface); padding: 8px 12px; }
+.tm span { font-size: 12.5px; color: var(--muted); }
+.tm input { font: 600 16px var(--f-body); color: var(--ink); background: transparent; border: 0; border-bottom: 1px dashed var(--line); padding: 2px 0; width: 100%; min-width: 0; }
+.tm input:focus { outline: none; border-bottom: 1px solid var(--c); }
+.tm input::placeholder { color: var(--muted); font-weight: 500; }
+.tm input:disabled { cursor: not-allowed; }
+@media (max-width: 700px) { .team-row { grid-template-columns: 1fr; } }
+
+/* Abas */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.tab {
+  font: 600 15px var(--f-body); color: var(--muted); background: none; border: 0;
+  border-bottom: 3px solid transparent; padding: 10px 14px 9px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center;
+}
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+.tab .count { font-family: var(--f-mono); font-size: 12px; font-weight: 500; color: var(--muted); }
+.view { display: grid; gap: 28px; }
+.sync { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.sync::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+.sync.ready::before { background: var(--ok); }
+.sync.readonly::before, .sync.off::before { background: var(--block); }
+
+/* Status nos itens do Gantt */
+.st { font-family: var(--f-mono); font-size: 10.5px; border-radius: 4px; padding: 2px 6px; border: 1px solid var(--line); color: var(--muted); font-variant-numeric: tabular-nums; }
+.st:empty { display: none; }
+.st.ok { background: var(--ok-soft); color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, transparent); }
+
+/* Cards */
+.people { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.person { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 12px 14px; display: grid; gap: 6px; border-top: 3px solid var(--c); }
+.person-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.person-top b { font-weight: 600; }
+.person .num { font-family: var(--f-mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.meter2 { height: 8px; border-radius: 4px; background: var(--weekend); overflow: hidden; }
+.meter2 i { display: block; height: 100%; width: 0; background: var(--c, var(--ok)); border-radius: 4px; transition: width .3s; }
+.fronts { display: grid; gap: 40px; }
+.front { display: grid; gap: 16px; }
+.front-head {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 12px 24px; align-items: end;
+  padding: 16px 18px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--c);
+}
+.front-title { display: grid; gap: 4px; min-width: 0; }
+.front-title h2 { font-size: 24px; }
+.front-who { font-size: 15px; color: var(--muted); }
+.front-who b { color: var(--ink); }
+.front-side { display: grid; gap: 10px; min-width: 0; }
+.front-cards { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.front-cards a { color: var(--ink); text-decoration: none; font-size: 14px; display: block; padding: 2px 0; }
+.front-cards a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.front-cards .code { color: var(--c); font-weight: 500; margin-right: 4px; }
+.front-prog { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.front-prog .meter2 { flex: 1; min-width: 120px; }
+@media (max-width: 760px) { .front-head { grid-template-columns: 1fr; } }
+.card-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr)); gap: 16px; align-items: start; }
+.card {
+  border: 1px solid var(--line); border-radius: 10px; background: var(--surface);
+  border-top: 4px solid var(--c); padding: 18px; display: grid; gap: 12px; min-width: 0; scroll-margin-top: 16px;
+}
+.card.is-done { border-top-color: var(--ok); }
+.card-head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: start; }
+.card-head > div { display: grid; gap: 2px; min-width: 0; }
+.card-head .who { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.card .prio-line, .card .goal, .card .link { font-size: 14px; color: var(--muted); }
+.card .goal b, .card .link b { color: var(--ink); font-weight: 600; }
+.done-row { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 8px; background: var(--bg); }
+.done-box { display: inline-flex; gap: 10px; align-items: center; font-weight: 600; cursor: pointer; }
+.prog { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 160px; }
+.prog .meter2 { flex: 1; }
+.prog span { font-family: var(--f-mono); font-size: 12.5px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.card details summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+.card details ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 4px; font-size: 14px; }
+.card h4 { margin: 4px 0 0; font: 700 14px var(--f-display); font-stretch: 92%; }
+.ca { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.ca li { display: grid; gap: 2px; padding: 6px 8px; border-radius: 6px; }
+.ca li:hover { background: var(--bg); }
+.ca label { display: grid; grid-template-columns: auto auto 1fr; gap: 4px 10px; align-items: start; cursor: pointer; font-size: 14px; line-height: 1.45; }
+.ca .ca-id { font-family: var(--f-mono); font-size: 12px; color: var(--muted); padding-top: 2px; }
+.ca .txt { min-width: 0; }
+.ca .txt .tag { margin-right: 6px; }
+.ca input:checked ~ .txt { color: var(--muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
+.tag { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .03em; border-radius: 4px; padding: 1px 5px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.tag.enunc { color: var(--block); border-color: color-mix(in srgb, var(--block) 40%, transparent); }
+.by { font-size: 12px; color: var(--muted); padding-left: 28px; }
+.by:empty { display: none; }
+.done-row .by { padding-left: 0; }
+input[type="checkbox"] { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--ok); cursor: pointer; }
+input[type="checkbox"]:disabled { cursor: not-allowed; }
+.warn { font-size: 13px; color: var(--block); background: var(--block-soft); border-radius: 6px; padding: 6px 10px; }
+.card code, .detail code { font-family: var(--f-mono); font-size: .9em; background: var(--bg); padding: 0 4px; border-radius: 3px; }
+.ref { font-family: var(--f-mono); font-size: 11px; white-space: nowrap; border-radius: 4px; padding: 1px 6px; border: 1px dashed var(--line); color: var(--muted); }
+.ref.pdf { border-style: solid; color: var(--ink); background: var(--bg); }
+.open-card { font: 600 13px var(--f-body); border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+
+@media (max-width: 860px) {
+  .detail-cols, .two, .people { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .row { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Tech Challenge FIAP · Fase 1 · Olist Intelligent Marketplace</span>
+    <h1>Sprint de entrega, 26/10 a 02/11</h1>
+    <div class="meta">
+      <span>Entrega <b class="mono">ter 03/11/2026</b></span>
+      <span id="countdown"></span>
+    </div>
+    <p class="lede">A Fase 1 é só escopo: nada é desenvolvido, sem banco de dados, API ou código. Cada linha é um card do backlog. A maior parte das frentes roda em paralelo; só quatro entregas travam o trabalho de outra pessoa. Elas têm prioridade Alta e horário marcado. Clique numa linha para ver do que ela depende e o que ela libera.</p>
+    <div class="stats" id="stats"></div>
+    <div class="team">
+      <span class="eyebrow">Responsáveis (cada frente, 3 cards)</span>
+      <div class="team-row">
+        <label class="tm" for="tm-dados" style="--c:var(--dados)"><span>Dados, análises e vídeo</span><input type="text" id="tm-dados" data-front="dados" placeholder="A definir" maxlength="40" autocomplete="off" disabled></label>
+        <label class="tm" for="tm-estrategia" style="--c:var(--estrategia)"><span>Estratégia, impacto e relatório</span><input type="text" id="tm-estrategia" data-front="estrategia" placeholder="A definir" maxlength="40" autocomplete="off" disabled></label>
+        <label class="tm" for="tm-agentes" style="--c:var(--agentes)"><span>Agentes, prompts e arquitetura</span><input type="text" id="tm-agentes" data-front="agentes" placeholder="A definir" maxlength="40" autocomplete="off" disabled></label>
+      </div>
+      <p class="hint" id="team-hint">Digite o nome e saia do campo para salvar. O nome aparece em todo o cronograma e nos cards.</p>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Visões">
+    <button type="button" class="tab" role="tab" id="tab-cronograma" data-view="cronograma" aria-controls="view-cronograma">Cronograma</button>
+    <button type="button" class="tab" role="tab" id="tab-cards" data-view="cards" aria-controls="view-cards">Cards e critérios <span class="count" id="tab-count"></span></button>
+  </div>
+
+  <section class="view" id="view-cards" role="tabpanel" aria-labelledby="tab-cards" hidden>
+    <div class="controls">
+      <div class="chips" role="group" aria-label="Filtrar cards por pessoa" id="cchips"></div>
+      <p class="sync" id="sync">Conectando para carregar as marcações do grupo…</p>
+    </div>
+    <div class="fronts" id="card-list"></div>
+  </section>
+
+  <div class="view" id="view-cronograma" role="tabpanel" aria-labelledby="tab-cronograma">
+  <div class="controls">
+    <div class="chips" role="group" aria-label="Filtrar por pessoa" id="chips"></div>
+    <div class="legend" aria-label="Legenda">
+      <span><i class="lg-bar"></i>trabalho</span>
+      <span><i class="lg-draft"></i>rascunho (hipótese, sem esperar dados)</span>
+      <span><i class="lg-ms"></i>marco do grupo</span>
+      <span><i class="lg-block"></i>entrega que trava outra pessoa</span>
+    </div>
+  </div>
+
+  <div>
+    <div class="gantt-box">
+      <p class="scroll-hint">Arraste para o lado para ver todos os dias.</p>
+      <div class="gantt" id="gantt"></div>
+    </div>
+  </div>
+
+  <section class="detail" id="detail" aria-live="polite"></section>
+
+  <div class="two">
+    <section>
+      <h2>Os 4 bloqueios da sprint</h2>
+      <p class="note">São as únicas passagens em que alguém espera outra pessoa terminar. Fora delas, os rascunhos e a montagem por seção evitam espera.</p>
+      <div class="blocks" id="blocks"></div>
+    </section>
+    <section>
+      <h2>Carga por pessoa</h2>
+      <p class="note">Horas estimadas, para comparar a carga. A frente de agentes ficou com mais carga, como combinado. Os quadrinhos mostram os dias com trabalho, de 26/10 a 02/11.</p>
+      <div class="load" id="load"></div>
+    </section>
+  </div>
+  </div>
+</div>
+
+<script type="application/json" id="cards-data">[
+{"id":"OLIST-2","owner":"dados","title":"Preparar e validar o dataset e os indicadores-base","prio":"**Alta** (bloqueia o Checkpoint 1) · **Datas:** 26 → 27 (indicadores-base até 27, 18h)","goal":"ter uma base confiável e regras de cálculo documentadas, para que nenhum número do relatório seja questionável.","link":"alimenta OLIST-3 (análises) e OLIST-5 (a \"evidência\" da matriz). A seção \"Metodologia\" do relatório (OLIST-7) sai daqui.","todo":["Baixar os 9 CSVs do Kaggle; inventariar tabelas, registros, granularidade e chaves. (Enunciado, pp. 3–4)","Definir regras de qualidade: contar pedido por `order_id`; agregar reviews por pedido; atraso = `delivered` com data real e estimada preenchidas; nulos não viram zero; geolocalização deduplicada por CEP. (Definição do grupo)","Calcular indicadores-base: pedidos, entregues válidos, taxa e média de atraso, distribuição de notas, % de reviews com comentário, cancelados/indisponíveis, recompra por `customer_unique_id`. (Enunciado, p. 7)","Entregar planilha com a fórmula de cada número. (Definição do grupo)","Ferramenta: Excel ou Google Sheets bastam, sem programação. A tabela `geolocation` tem ~1 milhão de linhas (no limite do Excel); se nenhuma análise usar coordenadas, use o estado do cliente (`customers`) e deixe essa tabela de fora. (Enunciado, pp. 4 e 7)"],"groups":[{"title":"","items":[{"id":"CA1","tag":"FIAP-3","text":"As 8 tabelas citadas no enunciado (customers, orders, order_items, payments, order_reviews, products, sellers, geolocation) estão inventariadas com nº de registros e granularidade"},{"id":"CA2","tag":"FIAP-3","text":"Existe uma lista escrita de ≥ 6 regras de qualidade, em linguagem simples"},{"id":"CA3","tag":"FIAP-3","text":"A planilha traz ≥ 10 indicadores, cada um com definição, fórmula e tabela de origem"},{"id":"CA4","tag":"QUAL","text":"Um colega (@agentes@ ou @estrategia@) reproduziu ≥ 3 indicadores e os valores bateram"},{"id":"CA5","tag":"FIAP-3","text":"O período coberto (datas inicial e final) e o nº de pedidos estão declarados"},{"id":"CA6","tag":"QUAL","text":"Nenhum número foi copiado do relatório de referência; todos saem dos CSVs"}]}]},
+{"id":"OLIST-3","owner":"dados","title":"Gerar insights e análises de profundidade","prio":"Média · **Datas:** 27 → 29","goal":"transformar números em achados que justifiquem os agentes; é a evidência de toda a espinha narrativa.","link":"insumo direto da matriz (OLIST-5), dos KPIs/impacto (OLIST-6) e dos gráficos (OLIST-4).","todo":["Análises \"núcleo\": atraso × nota; distribuição de notas; temas em comentários negativos; cancelamentos; recompra; atraso por estado. (Enunciado, pp. 2 e 7)","Análises diferenciais (≥ 2): atraso por categoria e por vendedor (concentração); frete/valor/peso × nota; tempo por etapa do ciclo (aprovação → postagem → entrega); atraso por faixa de dias × nota; sazonalidade mensal. (Enunciado, p. 5)","Para cada achado, escrever: **Fato · Leitura · Cautela · E daí?** (Enunciado, p. 5)","Eleger 4–6 achados principais, em ordem de relevância para os agentes. (Enunciado, p. 7)"],"groups":[{"title":"","items":[{"id":"CA1","tag":"ENUNC","text":"As análises são feitas **no dataset** (exigência do relatório) e cobrem ≥ 5 das dimensões listadas no enunciado (clientes, pedidos, pagamentos, produtos, logística, vendedores, avaliações, geolocalização) — o mínimo de 5 é meta do grupo"},{"id":"CA2","tag":"FIAP-4","text":"≥ 6 análises no total, das quais ≥ 2 são diferenciais (não existem no relatório de referência)"},{"id":"CA3","tag":"FIAP-4","text":"Todas trazem Fato, Leitura, Cautela e \"E daí?\" preenchidos"},{"id":"CA4","tag":"FIAP-4","text":"Nenhuma frase afirma causalidade; usa \"associado a\", \"compatível com\""},{"id":"CA5","tag":"FIAP-2","text":"Cada um dos 4–6 achados-chave aponta qual dos desafios do enunciado ele ilustra (cliente, logística, retenção, reviews, eficiência, automação, decisão, escala)"},{"id":"CA6","tag":"QUAL","text":"Todo número tem fórmula na planilha de OLIST-2"},{"id":"CA7","tag":"QUAL","text":"Lista dos achados-chave entregue a @estrategia@ e @agentes@"}]}]},
+{"id":"OLIST-4","owner":"dados","title":"Comunicação visual: gráficos, anexo metodológico e vídeo executivo","prio":"Média (gráficos) · **Alta** (vídeo, bloqueia a versão final) · **Datas:** gráficos 29 → 30 · vídeo: roteiro 30, gravação 31, edição e link até 01 à noite","goal":"dar qualidade visual às análises (principal lacuna da referência), documentar o método e apresentar o projeto à \"diretoria da Olist\" em vídeo.","link":"@estrategia@ insere gráficos e link no relatório; os números de destaque abrem o sumário executivo e o vídeo.","todo":["5–7 gráficos legíveis para executivos; título que diz a conclusão. (Enunciado, pp. 5–6)","3–5 \"números de destaque\" para o sumário executivo. (Enunciado, p. 7)","Anexo: dicionário de dados resumido, regras de qualidade, limitações do dataset. (Definição do grupo)","Exportar em alta resolução no padrão visual definido por @estrategia@. (Enunciado, p. 5)","**Vídeo:** roteiro (problema → achados → agentes → impacto → riscos → próximo passo), slides de apoio opcionais (o enunciado permite), gravação, upload e envio do link para @estrategia@. O apresentador pode ser @dados@ ou outro integrante; os três revisam o roteiro. (Enunciado, p. 11)"],"groups":[{"title":"gráficos e anexo","items":[{"id":"CA1","tag":"FIAP-7","text":"5 a 7 gráficos prontos; cada um com título-conclusão, fonte e legenda"},{"id":"CA2","tag":"FIAP-6","text":"Cada gráfico passa no \"teste dos 5 segundos\": um leigo entende a mensagem sem explicação"},{"id":"CA3","tag":"FIAP-8","text":"Paleta e tipografia idênticas ao template do relatório"},{"id":"CA4","tag":"FIAP-5","text":"Entregues 3–5 números de destaque para o sumário executivo"},{"id":"CA5","tag":"FIAP-4","text":"O anexo declara limitações: dados de 2016–2018, sem custos internos, sem dados de atendimento, comentários em apenas parte das avaliações"},{"id":"CA6","tag":"QUAL","text":"Nenhum gráfico replica o desenho de figuras do relatório de referência"},{"id":"CA7","tag":"QUAL","text":"Arquivos entregues a @estrategia@ em PNG/SVG nomeados por seção"}]},{"title":"vídeo","items":[{"id":"CA8","tag":"ENUNC","text":"Duração de até 5 minutos"},{"id":"CA9","tag":"ENUNC","text":"Pelo menos 1 integrante aparece apresentando"},{"id":"CA10","tag":"ENUNC","text":"Linguagem executiva, sem termos excessivamente técnicos, pensada para a diretoria da Olist"},{"id":"CA11","tag":"ENUNC","text":"Explica claramente os problemas e oportunidades identificados"},{"id":"CA12","tag":"QUAL","text":"Roteiro segue a mesma espinha narrativa do relatório e usa os mesmos números"},{"id":"CA13","tag":"QUAL","text":"Link testado em janela anônima (acesso liberado) e enviado para @estrategia@"}]}]},
+{"id":"OLIST-5","owner":"estrategia","title":"Oportunidades e matriz de priorização","prio":"Média (rascunho precisa estar pronto para o Checkpoint 1) · **Datas:** rascunho 26 → 27 · final 28","goal":"mostrar, com critério explícito, por que escolhemos certos casos de uso e não outros — o coração da \"visão estratégica\".","link":"define quais agentes @agentes@ vai especificar (OLIST-8); alimenta a seção \"Oportunidades\" do relatório.","todo":["Rascunho (Onda 1): listar 6–8 oportunidades candidatas a partir dos desafios do enunciado e passar para @agentes@. (Enunciado, p. 2)","Definir nossa matriz (critérios, pesos e escala próprios). (Enunciado, p. 5)","Final (Onda 2): pontuar com os dados de @dados@, justificar cada nota em uma frase, escolher 3–4 vencedoras e indicar o que fica para segunda onda. (Enunciado, p. 7)","Para cada vencedora: problema, evidência nos dados, usuários impactados e por que priorizar (benefício, impacto e riscos detalhados ficam em OLIST-6 e OLIST-8 — regra de \"uma fonte só\"). (Enunciado, pp. 6–7)"],"groups":[{"title":"","items":[{"id":"CA1","tag":"FIAP-1","text":"As oportunidades cobrem os 8 desafios citados no contexto do enunciado (experiência do cliente, eficiência logística, retenção, reviews, eficiência operacional, automação, apoio à decisão, escalabilidade) — cada um aparece em ≥ 1 oportunidade ou tem justificativa de exclusão"},{"id":"CA2","tag":"FIAP-1","text":"Matriz com critérios e pesos que somam 100%, e justificativa dos pesos"},{"id":"CA3","tag":"ENUNC","text":"Cada oportunidade escolhida cita ≥ 1 achado de OLIST-3 como evidência (o relatório pede \"problemas ou oportunidades identificadas\" a partir das análises)"},{"id":"CA4","tag":"ENUNC","text":"Cada oportunidade escolhida tem problema, evidência, usuários impactados e justificativa de prioridade"},{"id":"CA5","tag":"QUAL","text":"Notas identificadas como julgamento do grupo, não resultado estatístico"},{"id":"CA6","tag":"QUAL","text":"Oportunidades descartadas listadas com motivo"},{"id":"CA7","tag":"QUAL","text":"Pesos, nomes de critérios e escala diferentes da referência"},{"id":"CA8","tag":"FIAP-7","text":"Matriz apresentada em formato visual (heatmap, quadrante ou bolhas), não só tabela"},{"id":"CA9","tag":"QUAL","text":"Rascunho entregue para @agentes@ antes do Checkpoint 1"}]}]},
+{"id":"OLIST-6","owner":"estrategia","title":"Impacto esperado, KPIs, roadmap e conclusão","prio":"Média · **Datas:** roadmap 27 (não depende de agentes) · KPIs e impacto 28 → 30","goal":"responder \"qual o impacto?\" com honestidade e mostrar a evolução nas 5 fases.","link":"usa achados (OLIST-3) e agentes (OLIST-8); alimenta sumário executivo e conclusão.","todo":["Para cada agente, escrever a cadeia: problema → mudança no processo → indicador → resultado de negócio. (Enunciado, pp. 6–7)","Definir KPIs com fórmula, fonte e baseline (quando existir no dataset; senão \"medir no piloto\"). (Enunciado, p. 5)","Separar o que **pode ser afirmado** com o dataset, o que exige mais dados e o que só se prova em operação real. (Definição do grupo)","Incluir 2–3 indicadores de saúde dos agentes, que o monitoramento (OLIST-10) acompanharia: qualidade das respostas, % de casos escalados para humano e custo por atendimento. (Definição do grupo)","Roadmap das Fases 1–5 (o monitoramento entra quando houver protótipo, na Fase 3, e vira rotina na Fase 5); conclusão e recomendação final. (Enunciado, pp. 2 e 5)","(Riscos e autonomia ficam no card de @agentes@, OLIST-8; aqui só se referencia.)"],"groups":[{"title":"","items":[{"id":"CA1","tag":"ENUNC","text":"Cada agente tem impacto esperado para o negócio descrito e ≥ 2 KPIs com fórmula (o mínimo de 2 é meta do grupo)"},{"id":"CA2","tag":"ENUNC","text":"Cada agente tem o benefício traduzido em resultado de negócio pela cadeia completa (problema → mudança no processo → indicador → resultado)"},{"id":"CA3","tag":"ENUNC","text":"Os usuários envolvidos de cada agente estão citados e consistentes com o mapa de @agentes@"},{"id":"CA4","tag":"QUAL","text":"Nenhuma meta numérica (ex.: \"reduzir 20%\") sem baseline ou rotulada como hipótese"},{"id":"CA5","tag":"FIAP-4","text":"Há quadro \"pode afirmar / precisa de mais dados / só prova em operação\""},{"id":"CA6","tag":"FIAP-10","text":"Roadmap cobre as 5 fases com o que fazemos em cada uma e o que preservamos da Fase 1"},{"id":"CA7","tag":"FIAP-1","text":"Conclusão traz uma recomendação clara de decisão para a diretoria"},{"id":"CA8","tag":"FIAP-8","text":"KPIs em tabela padronizada (mesmas colunas para todos os agentes)"}]}]},
+{"id":"OLIST-7","owner":"estrategia","title":"Integração do relatório e qualidade final","prio":"**Alta** no template (bloqueia os gráficos) · Média na montagem · **Datas:** template 26 · seções 29 → 30 · v1 31 · v2 com link 01 · PDF final 02","goal":"juntar tudo em um relatório coeso, original e profissional — o documento que a FIAP avalia.","link":"ponto de integração de todos os cards; entrega final.","todo":["Criar o template visual (capa, paleta, tipografia) na Onda 0 e distribuir. (Enunciado, pp. 5–6)","Montar o relatório: capa, sumário executivo, contexto, método, análises, oportunidades, agentes, arquitetura, prompts, impacto/KPIs/riscos, roadmap, conclusão, link do vídeo, referências, anexo. (Enunciado, pp. 7–11)","Passar o relatório montado para @dados@ para o roteiro do vídeo; inserir o link quando ele entregar. (Enunciado, p. 11)","Revisão cruzada anti-plágio e checklist FIAP. (Enunciado, p. 5)"],"groups":[{"title":"","items":[{"id":"CA1","tag":"ENUNC","text":"Relatório feito em Word, Google Docs, Notion, Canva Docs ou similar, com 10 a 20 páginas (faixa sugerida pelo enunciado)"},{"id":"CA2","tag":"ENUNC","text":"O relatório responde, de forma explícita, à pergunta \"Como a Olist poderia utilizar IA Generativa e Agentes de IA para melhorar sua operação e seus indicadores de negócio?\" no sumário e na conclusão"},{"id":"CA3","tag":"ENUNC","text":"O relatório contém: principais problemas ou oportunidades, análises realizadas no dataset, sugestões iniciais de uso de IA e impacto esperado para o negócio"},{"id":"CA4","tag":"ENUNC","text":"O mapa de agentes está **dentro** do relatório"},{"id":"CA5","tag":"ENUNC","text":"A arquitetura conceitual está **dentro** do relatório"},{"id":"CA6","tag":"ENUNC","text":"Os prompts estão **dentro** do relatório"},{"id":"CA7","tag":"ENUNC","text":"O link do vídeo está **dentro** do relatório e abre"},{"id":"CA8","tag":"FIAP-5","text":"Sumário executivo de ≤ 1 página, com recomendação e 3–5 números de destaque"},{"id":"CA9","tag":"FIAP-8","text":"Padrão visual único: mesma fonte, cores, estilo de título, legendas e numeração em todo o documento"},{"id":"CA10","tag":"FIAP-6","text":"Revisão de linguagem: nenhum termo técnico sem explicação; cada seção abre com uma frase-conclusão"},{"id":"CA11","tag":"QUAL","text":"Revisão anti-plágio feita por quem não escreveu o trecho (regra da seção 1.5); sem frases de 8+ palavras iguais às do PDF de referência"},{"id":"CA12","tag":"QUAL","text":"Checklist dos 10 critérios FIAP (seção 1.3) preenchido, com a página onde cada um é atendido"},{"id":"CA13","tag":"QUAL","text":"Sem texto de rascunho, \"TODO\", placeholders ou tabelas quebradas entre páginas"},{"id":"CA14","tag":"FIAP-9","text":"Há ao menos 3 elementos de diferenciação identificados (ex.: análises diferenciais, agente diferente, visuais próprios)"},{"id":"CA15","tag":"QUAL","text":"Capa com os nomes dos integrantes; referências citam o enunciado FIAP e o dataset Olist (Kaggle) com link"}]}]},
+{"id":"OLIST-8","owner":"agentes","title":"Mapa de agentes, fichas, autonomia e riscos","prio":"**Alta** (a lista de agentes bloqueia KPIs, prompts e arquitetura) · **Datas:** rascunho 26 → 27 · lista fechada no Checkpoint 1 (27 à noite) · fichas, mapa e riscos 28 → 29","goal":"cumprir o entregável 2 (≥ 3 agentes) com clareza executiva e limites de autonomia. É escopo e desenho no papel: nada é construído nesta fase.","link":"origem de prompts (OLIST-9), arquitetura (OLIST-10) e KPIs (OLIST-6); a tabela de riscos entra direto no relatório; é o escopo que as próximas fases vão detalhar.","todo":["Rascunho (Onda 1): agentes candidatos a partir dos desafios do enunciado (em paralelo com o rascunho de oportunidades de @estrategia@, sem esperar por ele); levar ao Checkpoint 1. (Enunciado, p. 2)","Riscos de cada agente com mitigação (resposta inventada, viés, privacidade, autonomia excessiva, custo, adoção). (Enunciado, p. 6)","Decidir com o grupo os agentes finais (sugestão de diferencial: um agente de retenção/pós-venda ou de apoio à decisão para gestores). (Enunciado, p. 8)","Ficha por agente com os 5 campos do enunciado + quais dados usa, o que entrega, limites e quando chama humano. (Enunciado, p. 8)","Desenhar o mapa visual (Miro/Draw.io/Canva). (Enunciado, p. 8)","Justificar por que cada caso precisa de agente e não de regra simples. (Enunciado, pp. 6–7)","Definir nível de autonomia de cada agente. (Enunciado, p. 4)"],"groups":[{"title":"","items":[{"id":"CA1","tag":"ENUNC","text":"≥ 3 agentes definidos"},{"id":"CA2","tag":"ENUNC","text":"Cada agente tem, preenchidos: nome, objetivo, problema resolvido, usuários envolvidos, benefício esperado"},{"id":"CA3","tag":"ENUNC","text":"Mapa em diagrama simples e organizado, pouco texto, legível em uma página"},{"id":"CA4","tag":"ENUNC","text":"O mapa está dentro do relatório (imagem pronta para OLIST-7)"},{"id":"CA5","tag":"FIAP-1","text":"Cada agente está ligado a uma oportunidade da matriz de OLIST-5 e a um achado de OLIST-3"},{"id":"CA6","tag":"FIAP-2","text":"Cada agente tem um KPI de negócio associado (definido com @estrategia@)"},{"id":"CA7","tag":"QUAL","text":"Cada agente tem limites explícitos: o que nunca faz e quando aciona humano"},{"id":"CA8","tag":"QUAL","text":"Justificativa \"agente × regra simples × IA Generativa\" para cada caso"},{"id":"CA9","tag":"FIAP-9","text":"Nomes, escopo e fronteiras dos agentes não repetem os da referência (ao menos 1 agente diferente)"},{"id":"CA10","tag":"QUAL","text":"Sem sobreposição: nenhuma responsabilidade pertence a dois agentes"},{"id":"CA11","tag":"ENUNC","text":"O mapa organiza visualmente os fluxos entre os agentes (boa prática pedida no enunciado)"},{"id":"CA12","tag":"QUAL","text":"Matriz de autonomia (faz sozinho / recomenda / exige aprovação humana) definida aqui"},{"id":"CA13","tag":"QUAL","text":"Entradas e saídas de cada agente descritas em linguagem de negócio (quais dados usa e o que entrega), sem detalhe técnico"},{"id":"CA14","tag":"ENUNC","text":"Cada agente tem seus riscos explicados, com mitigação (meta do grupo: ≥ 3 por agente), em tabela padronizada"}]}]},
+{"id":"OLIST-9","owner":"agentes","title":"Prompts estruturados por agente","prio":"Média · **Datas:** estrutura padrão 27 · prompts 28 → 29 · revisão 30","goal":"cumprir o entregável 4: traduzir cada problema de negócio em instruções claras ao agente.","link":"usa os limites de OLIST-8; entra no relatório (OLIST-7); um exemplo pode ser mostrado no vídeo.","todo":["1 prompt completo por agente com os 4 blocos: (a) objetivo do prompt, (b) contexto fornecido, (c) instrução principal, (d) resultado esperado. (Enunciado, pp. 9–10)","Regras anti-alucinação e de escalonamento para humano. (Enunciado, pp. 10–11)","1 exemplo de entrada e saída por agente usando registros reais do dataset (que já é anonimizado), por exemplo uma review negativa real. (Enunciado, p. 10)"],"groups":[{"title":"","items":[{"id":"CA1","tag":"ENUNC","text":"≥ 1 prompt por agente do mapa (nenhum agente sem prompt)"},{"id":"CA2","tag":"ENUNC","text":"Cada prompt tem os blocos (a) objetivo, (b) contexto fornecido, (c) instrução principal, (d) resultado esperado, claramente identificados"},{"id":"CA3","tag":"ENUNC","text":"A instrução principal inclui: papel do agente, tarefa a executar e tipo de resposta esperada"},{"id":"CA4","tag":"ENUNC","text":"O formato de saída está definido (campos ou lista)"},{"id":"CA5","tag":"ENUNC","text":"Linguagem clara e sem ambiguidade; sem prompts excessivamente técnicos"},{"id":"CA6","tag":"QUAL","text":"O prompt proíbe inventar dados e diz o que fazer quando faltar informação"},{"id":"CA7","tag":"QUAL","text":"Cada prompt mostra um exemplo de entrada (registro real do dataset) e a saída esperada"},{"id":"CA8","tag":"QUAL","text":"Redação própria e estrutura diferente da referência"},{"id":"CA9","tag":"FIAP-8","text":"Os prompts seguem o mesmo bloco visual (mesmo layout para todos)"},{"id":"CA10","tag":"ENUNC","text":"Cada prompt está alinhado ao objetivo de negócio: o bloco (a) cita o problema e o KPI do agente (boa prática pedida no enunciado)"}]}]},
+{"id":"OLIST-10","owner":"agentes","title":"Arquitetura conceitual (diagrama)","prio":"Média · **Datas:** esqueleto 26 · diagrama final 29 → 30","goal":"cumprir o entregável 3 mostrando, num desenho, como dados, agentes e pessoas se conectam.","link":"deriva de OLIST-8; a camada de governança reflete os riscos e a autonomia de OLIST-8; insumo para o vídeo.","todo":["Diagrama (Draw.io/Miro/Figma) com fontes de dados, agentes, usuários, entradas/saídas e interações entre agentes. (Enunciado, p. 9)","Camada de governança (humano decide, registros, privacidade). (Enunciado, pp. 4 e 6)","Camada de **monitoramento (observabilidade) dos agentes**: registrar cada execução (o que entrou, o que o agente respondeu, quem aprovou), acompanhar qualidade, custo e erros, e coletar o feedback de quem usa. Citar uma ferramenta como exemplo, como o **LangSmith** (ou o Langfuse, alternativa aberta), deixando claro que a escolha e a configuração ficam para as Fases 3–5. (Definição do grupo)","Fluxo narrado de 6–8 passos com um pedido atrasado atravessando os agentes. (Enunciado, p. 9)","Uma frase sobre o que precisaria ser conectado no futuro (sem modelagem de banco nem API: isso é das próximas fases). (Enunciado, pp. 7 e 9)"],"groups":[{"title":"","items":[{"id":"CA1","tag":"ENUNC","text":"O diagrama mostra as **fontes de dados** (as tabelas do dataset usadas por cada agente)"},{"id":"CA2","tag":"ENUNC","text":"O diagrama mostra **todos os agentes** do mapa, com os mesmos nomes de OLIST-8"},{"id":"CA3","tag":"ENUNC","text":"O diagrama mostra os **usuários envolvidos**"},{"id":"CA4","tag":"ENUNC","text":"As **entradas e saídas de informação** estão rotuladas nas setas"},{"id":"CA5","tag":"ENUNC","text":"As **interações entre agentes** estão explícitas (quem passa o quê para quem)"},{"id":"CA6","tag":"ENUNC","text":"Sem detalhamento técnico avançado; legível em uma página por não técnico"},{"id":"CA7","tag":"ENUNC","text":"O diagrama está dentro do relatório (imagem pronta para OLIST-7)"},{"id":"CA8","tag":"FIAP-1","text":"Há camada de governança visível, com o ponto de aprovação humana"},{"id":"CA9","tag":"QUAL","text":"Exemplo narrado de ponta a ponta com um caso concreto"},{"id":"CA10","tag":"FIAP-9","text":"Desenho original: camadas, ordem e visual diferentes da referência"},{"id":"CA11","tag":"QUAL","text":"O diagrama mostra a camada de monitoramento ligada a todos os agentes, explicada em uma frase de negócio (\"acompanhar se os agentes acertam, quanto custam e onde erram\"), sem detalhe técnico"}]}]}
+]</script>
+<script>
+(function () {
+  const DAYS = [
+    { d: "26", w: "seg", tag: "kickoff" },
+    { d: "27", w: "ter", tag: "checkpoint 1" },
+    { d: "28", w: "qua", tag: "" },
+    { d: "29", w: "qui", tag: "" },
+    { d: "30", w: "sex", tag: "checkpoint 2" },
+    { d: "31", w: "sáb", tag: "fim de semana", kind: "weekend" },
+    { d: "01", w: "dom", tag: "fim de semana", kind: "weekend" },
+    { d: "02", w: "seg", tag: "Finados", kind: "holiday" },
+    { d: "03", w: "ter", tag: "entrega", kind: "deliver" }
+  ];
+  const FULL = ["26/10", "27/10", "28/10", "29/10", "30/10", "31/10", "01/11", "02/11", "03/11"];
+
+  // Responsáveis: nome digitado na página (salvo no db) ou o nome da frente enquanto não for definido.
+  const FRONT_LABEL = { dados: "Resp. Dados", estrategia: "Resp. Estratégia", agentes: "Resp. Agentes", todos: "Todos" };
+  const team = { dados: "", estrategia: "", agentes: "" };
+  function pname(k) { return esc(team[k] || FRONT_LABEL[k] || ""); }
+  function nm(html) { return String(html).replace(/@(dados|estrategia|agentes)@/g, (_, k) => pname(k)); }
+
+  const PEOPLE = {
+    dados: { get name() { return pname("dados"); }, color: "var(--dados)", hours: 23, cards: "OLIST-2 · OLIST-3 · OLIST-4 (gráficos + vídeo)" },
+    agentes: { get name() { return pname("agentes"); }, color: "var(--agentes)", hours: 28, cards: "OLIST-8 · OLIST-9 · OLIST-10 + revisão anti-plágio" },
+    estrategia: { get name() { return pname("estrategia"); }, color: "var(--estrategia)", hours: 22, cards: "OLIST-5 · OLIST-6 · OLIST-7 (template + montagem)" },
+    todos: { name: "Todos", color: "var(--todos)" }
+  };
+
+  // s/e = índice do dia (0 = 26/10). draft = rascunho; block = a entrega no fim do trecho trava outra pessoa.
+  const TASKS = [
+    { id: "kick", name: "Kickoff", owner: "todos", ms: 0, when: "30–60 min",
+      what: ["Confirmar prazo e quem faz o quê", "Acordar a espinha narrativa: problema → evidência → agente → impacto → risco", "Cada um sai com o primeiro passo do seu card"] },
+    { id: "o10a", code: "OLIST-7a", name: "Template visual", owner: "estrategia", prio: "alta",
+      segs: [{ s: 0, e: 0, label: "template", block: true }], due: "26/10, fim do dia",
+      what: ["Capa, paleta e tipografia do relatório", "Modelo de página e estilo de tabela", "Simples: cerca de 1 hora"] },
+    { id: "o2", code: "OLIST-2", name: "Dados e indicadores-base", owner: "dados", prio: "alta",
+      segs: [{ s: 0, e: 1, label: "CSVs + indicadores", block: true }], due: "27/10, 18h",
+      what: ["Inventário das 8 tabelas e regras de qualidade", "6 indicadores mínimos para o Checkpoint 1: atraso, nota × atraso, % com comentário, cancelamento, recompra, atraso por UF", "Planilha com a fórmula de cada número"] },
+    { id: "o5", code: "OLIST-5", name: "Oportunidades e matriz", owner: "estrategia", prio: "media",
+      segs: [{ s: 0, e: 1, label: "rascunho", draft: true }, { s: 2, e: 2, label: "matriz final" }], due: "rascunho até o Checkpoint 1",
+      what: ["Rascunho: 6–8 oportunidades a partir dos 8 desafios do enunciado", "Final: pontuar com os dados de @dados@ e escolher 3–4", "Matriz visual com critérios e pesos próprios"] },
+    { id: "o6", code: "OLIST-8", name: "Agentes, autonomia e riscos", owner: "agentes", prio: "alta",
+      segs: [{ s: 0, e: 1, label: "agentes candidatos", draft: true, block: true }, { s: 2, e: 3, label: "fichas, mapa e riscos" }], due: "lista de agentes fechada em 27/10, noite",
+      what: ["Rascunho: agentes candidatos a partir do enunciado", "Fichas com nome, objetivo, problema, usuários e benefício", "Mapa visual, matriz de autonomia e riscos com mitigação"] },
+    { id: "cp1", name: "Checkpoint 1: fechar a lista de agentes", owner: "todos", ms: 1, when: "noite",
+      what: ["Os dados de @dados@ mantêm, ajustam ou derrubam cada hipótese", "Sai daqui a lista final de agentes (≥ 3)"] },
+    { id: "o3", code: "OLIST-3", name: "Insights e análises", owner: "dados", prio: "media",
+      segs: [{ s: 1, e: 3, label: "≥ 6 análises, 2 diferenciais" }],
+      what: ["Análises núcleo + pelo menos 2 que a referência não fez", "Cada achado com Fato, Leitura, Cautela e “E daí?”", "Lista dos 4–6 achados-chave para @estrategia@ e @agentes@"] },
+    { id: "o7", code: "OLIST-9", name: "Prompts estruturados", owner: "agentes", prio: "media",
+      segs: [{ s: 1, e: 1, label: "estrutura", draft: true }, { s: 2, e: 3, label: "prompts" }, { s: 4, e: 4, label: "revisão" }],
+      what: ["1 prompt por agente com objetivo, contexto, instrução e resultado esperado", "Escrito no relatório, sem rodar em nenhuma ferramenta", "Exemplo de entrada com um registro real do dataset"] },
+    { id: "o8", code: "OLIST-10", name: "Arquitetura conceitual", owner: "agentes", prio: "media",
+      segs: [{ s: 0, e: 0, label: "esqueleto", draft: true }, { s: 3, e: 4, label: "diagrama final" }],
+      what: ["Desenho conceitual: fontes de dados, agentes, usuários, entradas/saídas e interações", "Camada de governança com aprovação humana", "Camada de monitoramento dos agentes (ex.: LangSmith), só como conceito", "Sem modelagem de banco nem API (fica para as próximas fases)"] },
+    { id: "o9", code: "OLIST-6", name: "Impacto, KPIs e roadmap", owner: "estrategia", prio: "media",
+      segs: [{ s: 1, e: 1, label: "roadmap" }, { s: 2, e: 4, label: "KPIs e impacto" }],
+      what: ["Roadmap das 5 fases (não depende dos agentes)", "≥ 2 KPIs por agente, com fórmula e baseline", "2–3 indicadores de saúde dos agentes: qualidade, % escalado para humano, custo", "Conclusão com recomendação para a diretoria"] },
+    { id: "o4a", code: "OLIST-4a", name: "Gráficos e anexo", owner: "dados", prio: "media",
+      segs: [{ s: 3, e: 4, label: "5–7 gráficos" }],
+      what: ["Gráficos com título que diz a conclusão", "3–5 números de destaque para o sumário", "Anexo com dicionário e limitações"] },
+    { id: "o10b", code: "OLIST-7b", name: "Montagem do relatório", owner: "estrategia", prio: "media",
+      segs: [{ s: 3, e: 4, label: "seções" }, { s: 5, e: 5, label: "v1" }, { s: 6, e: 6, label: "v2 + link" }],
+      what: ["Encaixar cada seção assim que fica pronta", "v1 completa no sábado, v2 com o link do vídeo no domingo", "Checklist dos 10 critérios FIAP"] },
+    { id: "cp2", name: "Checkpoint 2: revisão cruzada", owner: "todos", ms: 4, when: "noite",
+      what: ["Cada um revisa o card de outra pessoa contra os critérios de aceite", "Conteúdo congelado para o roteiro do vídeo"] },
+    { id: "o4b", code: "OLIST-4b", name: "Vídeo executivo", owner: "dados", prio: "alta",
+      segs: [{ s: 4, e: 4, label: "roteiro" }, { s: 5, e: 5, label: "gravação" }, { s: 6, e: 6, label: "edição + link", block: true }], due: "01/11, noite",
+      what: ["Até 5 minutos, linguagem de diretoria", "Problema → achados → agentes → impacto → riscos → próximo passo", "Link testado em janela anônima"] },
+    { id: "rev", code: "Revisão", name: "Anti-plágio e checklist FIAP", owner: "agentes", prio: "media",
+      segs: [{ s: 5, e: 6, label: "revisão cruzada" }],
+      what: ["@agentes@ conduz; as partes escritas por @agentes@ são revisadas por @estrategia@", "Nenhuma frase de 8+ palavras igual à referência", "Conferir a matriz de rastreabilidade"] },
+    { id: "buf", code: "Folga", name: "PDF final e teste do link", owner: "todos", prio: "media",
+      segs: [{ s: 7, e: 7, label: "folga" }],
+      what: ["Dia reservado para imprevistos (feriado)", "Exportar o PDF e abrir o link do vídeo fora da conta"] },
+    { id: "ent", name: "Entrega", owner: "todos", ms: 8, when: "ter 03/11",
+      what: ["Relatório com mapa, arquitetura, prompts e link do vídeo"] }
+  ];
+
+  // hard = trava outra pessoa (bloqueio); soft = alimenta, mas não trava
+  const EDGES = [
+    ["o10a", "o4a", "hard"], ["o2", "cp1", "hard"], ["o5", "cp1", "soft"], ["o6", "cp1", "hard"],
+    ["cp1", "o7", "hard"], ["cp1", "o8", "hard"], ["cp1", "o9", "hard"],
+    ["o2", "o3", "soft"], ["o2", "o9", "soft"], ["o3", "o4a", "soft"], ["o3", "o5", "soft"],
+    ["o4a", "o10b", "soft"], ["o7", "o10b", "soft"], ["o8", "o10b", "soft"], ["o9", "o10b", "soft"],
+    ["kick", "o10a", "soft"], ["cp2", "o4b", "soft"], ["o4b", "o10b", "hard"],
+    ["o10b", "rev", "soft"], ["rev", "buf", "soft"], ["o10b", "buf", "soft"], ["buf", "ent", "soft"]
+  ];
+
+  const BLOCKS = [
+    { who: "estrategia", what: "Template visual", code: "OLIST-7a", due: "26/10 · fim do dia", waits: "@dados@, para padronizar os gráficos",
+      mit: "template simples, cerca de 1 hora; cores e fontes bastam." },
+    { who: "dados", what: "Indicadores-base", code: "OLIST-2", due: "27/10 · 18h", waits: "todos, no Checkpoint 1",
+      mit: "entregar só os 6 números mínimos; o resto vai para OLIST-3." },
+    { who: "agentes", what: "Lista final de agentes", code: "OLIST-8", due: "27/10 · noite", waits: "@estrategia@ (KPIs) e @agentes@ (prompts e arquitetura)",
+      mit: "decidir na reunião do Checkpoint 1; @estrategia@ adianta o roadmap, que não depende dos agentes." },
+    { who: "dados", what: "Link do vídeo", code: "OLIST-4b", due: "01/11 · noite", waits: "@estrategia@, para a versão final do relatório",
+      mit: "roteiro sai do conteúdo do Checkpoint 2, sem esperar o PDF; o dia 02 fica de folga." }
+  ];
+
+  const byId = Object.fromEntries(TASKS.map(t => [t.id, t]));
+  const label = t => (t.code ? t.code + " · " : "") + t.name;
+  let filter = "all";
+  let selected = null;
+  try { filter = localStorage.getItem("sprint-filter") || "all"; } catch (e) {}
+  if (!["all", "dados", "agentes", "estrategia", "block"].includes(filter)) filter = "all";
+
+  // Cabeçalho: contagem regressiva
+  (function countdown() {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const start = new Date(2026, 9, 26), end = new Date(2026, 10, 3);
+    const day = 86400000;
+    const el = document.getElementById("countdown");
+    if (today < start) {
+      const n = Math.round((start - today) / day);
+      el.innerHTML = "Começa em <b class='mono'>" + n + (n === 1 ? " dia" : " dias") + "</b>";
+    } else if (today <= end) {
+      const n = Math.round((end - today) / day);
+      el.innerHTML = n === 0 ? "<b>Hoje é a entrega</b>" : "Faltam <b class='mono'>" + n + (n === 1 ? " dia" : " dias") + "</b> para a entrega";
+    } else {
+      el.textContent = "Sprint encerrada";
+    }
+  })();
+
+  // Frentes ativas por dia (tarefas com trabalho, sem contar marcos)
+  const perDay = DAYS.map((_, i) => TASKS.filter(t => t.segs && t.segs.some(s => i >= s.s && i <= s.e)).length);
+  const peak = Math.max(...perDay);
+  const peakDay = perDay.indexOf(peak);
+  const hardCount = BLOCKS.length;
+  const softCount = EDGES.filter(e => e[2] === "soft").length;
+
+  document.getElementById("stats").innerHTML = [
+    ["9", "cards em 3 frentes"],
+    [peak + "", "frentes ao mesmo tempo no pico (" + FULL[peakDay] + ")"],
+    [hardCount + "", "bloqueios, todos com prioridade Alta", "alert"],
+    ["1", "dia de folga antes da entrega"]
+  ].map(([n, t, c]) => `<div class="stat ${c || ""}"><strong>${n}</strong><span>${t}</span></div>`).join("");
+
+  // Filtros
+  const CHIPS = [
+    ["all", "Todos"], ["dados", "@dados@"], ["agentes", "@agentes@"], ["estrategia", "@estrategia@"], ["block", "Só o que trava"]
+  ];
+  const chipsEl = document.getElementById("chips");
+  function renderChips() {
+    chipsEl.innerHTML = CHIPS.map(([k, n]) => {
+      const dot = PEOPLE[k] ? `<span class="dot" style="background:${PEOPLE[k].color}"></span>` : (k === "block" ? `<span class="dot" style="background:var(--block)"></span>` : "");
+      return `<button type="button" class="chip" id="chip-${k}" data-k="${k}" aria-pressed="${filter === k}">${dot}${nm(n)}</button>`;
+    }).join("");
+  }
+  renderChips();
+  chipsEl.addEventListener("click", e => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    filter = b.dataset.k;
+    try { localStorage.setItem("sprint-filter", filter); } catch (err) {}
+    chipsEl.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", c.dataset.k === filter));
+    renderGantt();
+  });
+
+  function visible(t) {
+    if (filter === "all") return true;
+    if (filter === "block") return t.prio === "alta" || t.id === "cp1" || t.id === "ent";
+    return t.owner === filter || (t.ms !== undefined);
+  }
+
+  function prioPill(t) {
+    if (!t.prio) return "";
+    return t.prio === "alta" ? `<span class="pill alta">Alta</span>` : `<span class="pill">Média</span>`;
+  }
+
+  function dayCells() {
+    return DAYS.map((d, i) => `<div class="day ${d.kind || ""}" style="grid-column:${i + 2}"></div>`).join("");
+  }
+
+  function renderGantt() {
+    const g = document.getElementById("gantt");
+    const head = `<div class="grid head">
+      <div class="hname">Card · responsável · prioridade</div>
+      ${DAYS.map(d => `<div class="hcell ${d.kind || ""}"><span class="w">${d.w}</span><span class="d">${d.d}</span><span class="tag">${d.tag || "&nbsp;"}</span></div>`).join("")}
+    </div>`;
+    const rows = TASKS.filter(visible).map(t => {
+      const p = PEOPLE[t.owner];
+      const isMs = t.ms !== undefined;
+      let marks = "";
+      if (isMs) {
+        marks = `<div class="ms" style="grid-column:${t.ms + 2}"><span class="dia" aria-hidden="true"></span><span class="when">${t.when}</span></div>`;
+      } else {
+        marks = t.segs.map(s => `<div class="seg ${s.draft ? "draft" : ""}" style="grid-column:${s.s + 2} / ${s.e + 3}" title="${s.label}${s.block ? " · entrega que trava outra pessoa" : ""}"><span>${s.label}</span>${s.block ? '<i class="tri" aria-label="trava outra pessoa"></i>' : ""}</div>`).join("");
+      }
+      return `<div class="grid row ${isMs ? "milestone" : ""}" role="button" tabindex="0" data-id="${t.id}" style="--c:${p.color}" aria-label="${label(t)}, ${p.name}">
+        <div class="name">
+          <span class="t">${t.name}</span>
+          <span class="s">${t.code ? `<span class="code">${t.code}</span>` : ""}<span>${p.name}</span>${prioPill(t)}${cardOf(t) ? `<span class="st" data-st="${cardOf(t)}"></span>` : ""}</span>
+        </div>
+        ${dayCells()}
+        ${marks}
+      </div>`;
+    }).join("");
+    const max = Math.max(...perDay);
+    const foot = `<div class="grid foot">
+      <div class="name">Frentes ativas no dia</div>
+      ${perDay.map((n, i) => `<div class="cnt" style="grid-column:${i + 2}"><b>${n}</b><span class="meter"><i style="width:${max ? (n / max) * 100 : 0}%"></i></span></div>`).join("")}
+    </div>`;
+    g.innerHTML = head + rows + foot;
+    applyFocus();
+    fillGanttStatus();
+  }
+
+  function related(id) {
+    const s = new Set([id]);
+    EDGES.forEach(([a, b]) => { if (a === id) s.add(b); if (b === id) s.add(a); });
+    return s;
+  }
+
+  function applyFocus() {
+    const g = document.getElementById("gantt");
+    const rel = selected ? related(selected) : null;
+    g.classList.toggle("focusing", !!selected);
+    g.querySelectorAll(".row").forEach(r => {
+      r.classList.toggle("is-related", !!rel && rel.has(r.dataset.id));
+      r.classList.toggle("is-selected", r.dataset.id === selected);
+      r.setAttribute("aria-pressed", r.dataset.id === selected);
+    });
+  }
+
+  function dateRange(t) {
+    if (t.ms !== undefined) return FULL[t.ms] + " · " + t.when;
+    const s = Math.min(...t.segs.map(x => x.s)), e = Math.max(...t.segs.map(x => x.e));
+    return s === e ? FULL[s] : FULL[s] + " → " + FULL[e];
+  }
+
+  function relList(items, dir) {
+    if (!items.length) return `<p class="empty">${dir === "in" ? "Nada. Pode começar já." : "Nada depende diretamente desta tarefa."}</p>`;
+    return `<ul class="rel">${items.map(([id, kind]) => `<li><span class="kind ${kind}">${kind === "hard" ? (dir === "in" ? "espera" : "trava") : (dir === "in" ? "usa" : "alimenta")}</span><button type="button" data-goto="${id}">${label(byId[id])}</button></li>`).join("")}</ul>`;
+  }
+
+  function renderDetail() {
+    const el = document.getElementById("detail");
+    const t = byId[selected || "o6"];
+    const p = PEOPLE[t.owner];
+    const ins = EDGES.filter(e => e[1] === t.id).map(e => [e[0], e[2]]);
+    const outs = EDGES.filter(e => e[0] === t.id).map(e => [e[1], e[2]]);
+    el.style.setProperty("--c", p.color);
+    el.innerHTML = `
+      <div class="detail-head">
+        <div style="display:grid;gap:4px">
+          <span class="eyebrow">${selected ? "Tarefa selecionada" : "Exemplo: clique em qualquer linha do Gantt"}</span>
+          <h2>${label(t)}</h2>
+        </div>
+        <div class="who">
+          <span>${p.name}</span>${prioPill(t)}<span class="mono">${dateRange(t)}</span>
+          ${selected ? '<button type="button" class="clear" id="clear-sel">Limpar seleção</button>' : ""}
+        </div>
+      </div>
+      ${t.due ? `<p class="hint"><b style="color:var(--block)">Prazo da entrega que trava:</b> <span class="mono">${t.due}</span></p>` : ""}
+      ${cardOf(t) ? `<div class="done-row"><span class="hint">Critérios de aceite de ${cardOf(t)}: <b class="mono" data-st-text="${cardOf(t)}"></b></span><button type="button" class="open-card" data-open-card="${cardOf(t)}">Ver card e marcar critérios</button></div>` : ""}
+      <div class="detail-cols">
+        <div><h3>O que entregar</h3><ul>${t.what.map(w => `<li>${nm(w)}</li>`).join("")}</ul></div>
+        <div><h3>Depende de</h3>${relList(ins, "in")}</div>
+        <div><h3>Libera</h3>${relList(outs, "out")}</div>
+      </div>`;
+  }
+
+  function select(id) {
+    selected = selected === id ? null : id;
+    applyFocus();
+    renderDetail();
+    fillGanttStatus();
+  }
+
+  const gEl = document.getElementById("gantt");
+  gEl.addEventListener("click", e => { const r = e.target.closest(".row"); if (r) select(r.dataset.id); });
+  gEl.addEventListener("keydown", e => {
+    const r = e.target.closest(".row");
+    if (r && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); select(r.dataset.id); }
+  });
+  document.getElementById("detail").addEventListener("click", e => {
+    const oc = e.target.closest("[data-open-card]");
+    if (oc) { openCard(oc.dataset.openCard); return; }
+    const go = e.target.closest("[data-goto]");
+    if (go) {
+      const id = go.dataset.goto;
+      if (!visible(byId[id])) {
+        filter = "all";
+        try { localStorage.setItem("sprint-filter", filter); } catch (err) {}
+        chipsEl.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", c.dataset.k === filter));
+        renderGantt();
+      }
+      selected = null; select(id);
+      const row = gEl.querySelector(`.row[data-id="${id}"]`);
+      if (row) row.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      return;
+    }
+    if (e.target.id === "clear-sel") { selected = null; applyFocus(); renderDetail(); fillGanttStatus(); }
+  });
+
+  // Bloqueios
+  function renderBlocks() {
+    document.getElementById("blocks").innerHTML = BLOCKS.map(b => `
+    <div class="bk">
+      <div class="bk-top"><b>${b.what} <span class="code" style="color:var(--muted)">${b.code}</span></b><span class="due">até ${b.due}</span></div>
+      <p class="flow"><b style="color:${PEOPLE[b.who].color}">${PEOPLE[b.who].name}</b> entrega → espera: ${nm(b.waits)}</p>
+      <p class="mit">${nm(b.mit)}</p>
+    </div>`).join("");
+  }
+
+  // Carga
+  const maxH = Math.max(...["dados", "agentes", "estrategia"].map(k => PEOPLE[k].hours));
+  function renderLoad() {
+  document.getElementById("load").innerHTML = ["agentes", "dados", "estrategia"].map(k => {
+    const p = PEOPLE[k];
+    const active = DAYS.slice(0, 8).map((_, i) => TASKS.some(t => t.owner === k && t.segs && t.segs.some(s => i >= s.s && i <= s.e)));
+    return `<div class="lp" style="--c:${p.color}">
+      <div class="lp-top"><b>${p.name}</b><span class="h">~${p.hours}h</span></div>
+      <div class="bar"><i style="width:${(p.hours / maxH) * 100}%"></i></div>
+      <div class="days" aria-label="dias com trabalho">${active.map((on, i) => `<i class="${on ? "on" : ""}" title="${FULL[i]}${on ? ": com trabalho" : ": livre"}"></i>`).join("")}</div>
+      <span class="cards">${p.cards}</span>
+    </div>`;
+  }).join("") + `<p class="note">${softCount} das ${EDGES.length} ligações entre tarefas só alimentam a próxima, sem travar ninguém.</p>`;
+  }
+
+  // ---------- Cards e critérios de aceite (marcações compartilhadas no db) ----------
+  let CARDS = [];
+  try { CARDS = JSON.parse(document.getElementById("cards-data").textContent); } catch (e) { CARDS = []; }
+  const cardById = Object.fromEntries(CARDS.map(c => [c.id, c]));
+  const checks = new Map();          // chave "OLIST-2__CA1" ou "OLIST-2__done" → {checked, by, at}
+  const names = {};                  // id do usuário → nome resolvido nesta visita
+  const asked = new Set();
+  let db = null, userCap = null, uid = null;
+  let dbState = "loading";           // loading | ready | readonly | off
+  let cfilter = "all";
+  try { cfilter = localStorage.getItem("cards-filter") || "all"; } catch (e) {}
+  if (!["all", "dados", "agentes", "estrategia"].includes(cfilter)) cfilter = "all";
+
+  function cardOf(t) {
+    if (!t.code || !/^OLIST-\d+/.test(t.code)) return null;
+    const id = t.code.match(/^OLIST-\d+/)[0];
+    return cardById[id] ? id : null;
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch])); }
+  function md(s) {
+    return nm(esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "<code>$1</code>"));
+  }
+  // Item do "O que fazer": a referência ao PDF do enunciado no fim do texto vira uma etiqueta.
+  function todoItem(s) {
+    const m = String(s).match(/^(.*?)\s*\((Enunciado(?: do PDF)?, p(?:p)?\. [^)]+|Definição do grupo)\)\s*$/);
+    if (!m) return md(s);
+    const ref = m[2];
+    const isPdf = ref.startsWith("Enunciado");
+    const label = isPdf ? "PDF " + ref.replace(/^Enunciado(?: do PDF)?, /, "") : "Definição do grupo";
+    const tip = isPdf ? "Página do PDF do enunciado (TECH CHALLENGE AGENTIC AI - FASE 1.pdf)" : "Não vem do enunciado: é uma decisão do grupo";
+    return md(m[1]) + ` <span class="ref ${isPdf ? "pdf" : ""}" title="${tip}">${label}</span>`;
+  }
+  const isOn = k => !!(checks.get(k) && checks.get(k).checked);
+  function stats(id) {
+    const c = cardById[id]; let tot = 0, ok = 0;
+    c.groups.forEach(g => g.items.forEach(it => { tot++; if (isOn(id + "__" + it.id)) ok++; }));
+    return { tot, ok, done: isOn(id + "__done") };
+  }
+  function tagInfo(tag) {
+    if (tag === "ENUNC") return ["enunc", "Enunciado", "Exigência literal do enunciado"];
+    if (tag === "QUAL") return ["", "Qualidade", "Padrão combinado pelo grupo"];
+    const n = tag.replace("FIAP-", "");
+    return ["", "FIAP " + n, "Critério de avaliação FIAP nº " + n];
+  }
+  const TOTAL_CA = CARDS.reduce((a, c) => a + c.groups.reduce((b, g) => b + g.items.length, 0), 0);
+
+  document.getElementById("stats").insertAdjacentHTML("beforeend",
+    `<div class="stat"><strong id="stat-prog">0/${TOTAL_CA}</strong><span>critérios de aceite marcados</span></div>`);
+
+  // Filtros dos cards
+  const cchipsEl = document.getElementById("cchips");
+  function renderCChips() {
+    cchipsEl.innerHTML = [["all", "Todos"], ["dados", "@dados@"], ["agentes", "@agentes@"], ["estrategia", "@estrategia@"]].map(([k, n]) => {
+      const dot = PEOPLE[k] ? `<span class="dot" style="background:${PEOPLE[k].color}"></span>` : "";
+      return `<button type="button" class="chip" id="cchip-${k}" data-k="${k}" aria-pressed="${cfilter === k}">${dot}${nm(n)}</button>`;
+    }).join("");
+  }
+  renderCChips();
+  cchipsEl.addEventListener("click", e => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    cfilter = b.dataset.k;
+    try { localStorage.setItem("cards-filter", cfilter); } catch (err) {}
+    cchipsEl.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", c.dataset.k === cfilter));
+    renderCards();
+  });
+
+  // As três frentes, na ordem do plano, cada uma com seus 3 cards numerados em sequência.
+  const FRONTS = [
+    { key: "dados", label: "Dados, análises e vídeo", cards: ["OLIST-2", "OLIST-3", "OLIST-4"] },
+    { key: "estrategia", label: "Estratégia, impacto e relatório", cards: ["OLIST-5", "OLIST-6", "OLIST-7"] },
+    { key: "agentes", label: "Agentes, prompts e arquitetura", cards: ["OLIST-8", "OLIST-9", "OLIST-10"] }
+  ];
+
+  function renderCards() {
+    const list = document.getElementById("card-list");
+    const openTodo = new Set([...list.querySelectorAll("details[open]")].map(d => d.dataset.card));
+    const fronts = FRONTS.filter(f => cfilter === "all" || f.key === cfilter);
+    list.innerHTML = fronts.map((f, i) => {
+      const who = team[f.key] ? `<b>${esc(team[f.key])}</b>` : `<i>a definir</i>`;
+      const cards = f.cards.map(id => cardById[id]).filter(Boolean);
+      return `<section class="front" style="--c:${PEOPLE[f.key].color}" aria-labelledby="front-${f.key}">
+        <header class="front-head">
+          <div class="front-title">
+            <span class="eyebrow">Frente ${FRONTS.indexOf(f) + 1} de ${FRONTS.length}</span>
+            <h2 id="front-${f.key}">${f.label}</h2>
+            <p class="front-who">Responsável: ${who}</p>
+          </div>
+          <div class="front-side">
+            <ol class="front-cards">${cards.map(c => `<li><a href="#card-${c.id}" data-jump="${c.id}"><span class="code">${c.id}</span> ${esc(c.title)}</a></li>`).join("")}</ol>
+            <div class="front-prog"><span class="meter2"><i data-front-bar="${f.key}"></i></span><span class="num" data-front-prog="${f.key}"></span></div>
+          </div>
+        </header>
+        <div class="card-list">${cards.map(c => cardHtml(c, openTodo)).join("")}</div>
+      </section>`;
+    }).join("");
+    applyChecks();
+  }
+
+  function cardHtml(c, openTodo) {
+      const p = PEOPLE[c.owner] || PEOPLE.todos;
+      const alta = /Alta/.test(c.prio);
+      const groups = c.groups.map(g => `
+        <h4>Critérios de aceite${g.title ? " · " + esc(g.title) : ""}</h4>
+        <ul class="ca">${g.items.map(it => {
+          const key = c.id + "__" + it.id;
+          const [cls, lbl, tip] = tagInfo(it.tag);
+          return `<li><label for="ck-${key}"><input type="checkbox" id="ck-${key}" data-key="${key}" disabled><span class="ca-id">${it.id}</span><span class="txt"><span class="tag ${cls}" title="${tip}">${lbl}</span>${md(it.text)}</span></label><span class="by" data-by="${key}"></span></li>`;
+        }).join("")}</ul>`).join("");
+      return `<article class="card" id="card-${c.id}" style="--c:${p.color}">
+        <header class="card-head">
+          <div><span class="code">${c.id}</span><h3>${esc(c.title)}</h3></div>
+          <div class="who"><span>${p.name}</span>${alta ? '<span class="pill alta">Alta</span>' : '<span class="pill">Média</span>'}</div>
+        </header>
+        <p class="prio-line">${md(c.prio)}</p>
+        <div class="done-row">
+          <label class="done-box" for="ck-${c.id}__done"><input type="checkbox" id="ck-${c.id}__done" data-key="${c.id}__done" disabled>Card concluído</label>
+          <div class="prog"><span class="meter2"><i data-bar="${c.id}"></i></span><span data-prog="${c.id}"></span></div>
+          <span class="by" data-by="${c.id}__done"></span>
+        </div>
+        <p class="warn" data-warn="${c.id}" hidden></p>
+        <p class="goal"><b>Objetivo:</b> ${md(c.goal)}</p>
+        <details data-card="${c.id}"${openTodo.has(c.id) ? " open" : ""}><summary>O que fazer (${c.todo.length} itens, com a página do enunciado)</summary><ul>${c.todo.map(x => `<li>${todoItem(x)}</li>`).join("")}</ul></details>
+        ${groups}
+        <p class="link"><b>Conexão com o restante:</b> ${md(c.link)}</p>
+      </article>`;
+  }
+
+  function fmtWhen(iso) {
+    const d = new Date(iso); if (isNaN(d)) return "";
+    return String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0") + " " +
+      String(d.getHours()).padStart(2, "0") + "h" + String(d.getMinutes()).padStart(2, "0");
+  }
+
+  function fillGanttStatus() {
+    if (!CARDS.length) return;
+    document.querySelectorAll("[data-st]").forEach(el => {
+      const s = stats(el.dataset.st);
+      el.textContent = s.done ? "✓ feito" : s.ok + "/" + s.tot;
+      el.classList.toggle("ok", s.done);
+      el.title = s.done ? "Card marcado como concluído" : s.ok + " de " + s.tot + " critérios de aceite marcados";
+    });
+    document.querySelectorAll("[data-st-text]").forEach(el => {
+      const s = stats(el.dataset.stText);
+      el.textContent = s.ok + " de " + s.tot + " marcados" + (s.done ? " · card concluído" : "");
+    });
+  }
+
+  // Redesenha tudo que mostra o nome de um responsável.
+  function renderAll() {
+    renderChips();
+    renderCChips();
+    renderGantt();
+    renderDetail();
+    renderBlocks();
+    renderLoad();
+    renderCards();
+  }
+
+  function applyTeamInputs() {
+    document.querySelectorAll(".tm input").forEach(inp => {
+      inp.disabled = dbState !== "ready";
+      if (document.activeElement !== inp) inp.value = team[inp.dataset.front] || "";
+    });
+  }
+
+  const teamWriting = new Map();
+  async function writeTeam(front) {
+    if (teamWriting.get(front)) { teamWriting.set(front, "again"); return; }
+    teamWriting.set(front, "busy");
+    try {
+      do {
+        teamWriting.set(front, "busy");
+        await db.collection("team").doc(front).set({ name: team[front] || "" });
+      } while (teamWriting.get(front) === "again");
+    } catch (e) {
+      if (e && (e.code === "invalid_argument" || e.code === "not_granted")) dbState = "readonly";
+      setSync();
+      applyTeamInputs();
+      applyChecks();
+    } finally {
+      teamWriting.delete(front);
+    }
+  }
+
+  document.querySelector(".team-row").addEventListener("change", e => {
+    const inp = e.target.closest("input[data-front]");
+    if (!inp || dbState !== "ready") return;
+    const v = inp.value.replace(/\s+/g, " ").trim().slice(0, 40);
+    inp.value = v;
+    if (v === (team[inp.dataset.front] || "")) return;
+    team[inp.dataset.front] = v;
+    renderAll();
+    writeTeam(inp.dataset.front);
+  });
+  document.querySelector(".team-row").addEventListener("keydown", e => {
+    if (e.key === "Enter" && e.target.matches("input[data-front]")) e.target.blur();
+  });
+
+  function applyChecks() {
+    const editable = dbState === "ready";
+    applyTeamInputs();
+    document.querySelectorAll("#card-list input[data-key]").forEach(inp => {
+      inp.checked = isOn(inp.dataset.key);
+      inp.disabled = !editable;
+    });
+    document.querySelectorAll("#card-list [data-by]").forEach(el => {
+      const v = checks.get(el.dataset.by);
+      if (v && v.checked && v.by) {
+        const who = names[v.by] || (v.by === uid ? "você" : "alguém do grupo");
+        el.textContent = "marcado por " + who + (v.at ? " em " + fmtWhen(v.at) : "");
+      } else el.textContent = "";
+    });
+    let okAll = 0;
+    CARDS.forEach(c => {
+      const s = stats(c.id); okAll += s.ok;
+      const bar = document.querySelector(`[data-bar="${c.id}"]`);
+      if (bar) bar.style.width = (s.tot ? (s.ok / s.tot) * 100 : 0) + "%";
+      const pg = document.querySelector(`[data-prog="${c.id}"]`);
+      if (pg) pg.textContent = s.ok + "/" + s.tot + " critérios";
+      const card = document.getElementById("card-" + c.id);
+      if (card) card.classList.toggle("is-done", s.done);
+      const w = document.querySelector(`[data-warn="${c.id}"]`);
+      if (w) {
+        const open = s.tot - s.ok;
+        w.hidden = !(s.done && open > 0);
+        w.textContent = "Marcado como concluído, mas " + (open === 1 ? "1 critério ainda está aberto." : open + " critérios ainda estão abertos.");
+      }
+    });
+    const sp = document.getElementById("stat-prog");
+    if (sp) sp.textContent = okAll + "/" + TOTAL_CA;
+    const doneCards = CARDS.filter(c => stats(c.id).done).length;
+    document.getElementById("tab-count").textContent = doneCards + "/" + CARDS.length;
+    FRONTS.forEach(f => {
+      let tot = 0, ok = 0, done = 0;
+      f.cards.forEach(id => { if (!cardById[id]) return; const s = stats(id); tot += s.tot; ok += s.ok; if (s.done) done++; });
+      const bar = document.querySelector(`[data-front-bar="${f.key}"]`);
+      if (bar) bar.style.width = (tot ? (ok / tot) * 100 : 0) + "%";
+      const txt = document.querySelector(`[data-front-prog="${f.key}"]`);
+      if (txt) txt.textContent = done + "/" + f.cards.length + " cards concluídos · " + ok + " de " + tot + " critérios";
+    });
+    fillGanttStatus();
+  }
+
+  function setSync() {
+    const el = document.getElementById("sync");
+    el.className = "sync " + dbState;
+    el.textContent = {
+      loading: "Conectando para carregar as marcações do grupo…",
+      ready: "Marcações salvas e compartilhadas com o grupo. Atualiza sozinho quando alguém marca.",
+      readonly: "Você pode ver as marcações, mas não marcar. Peça ao dono da página acesso de Contributor ou Editor.",
+      off: "As marcações não estão disponíveis nesta visualização. Abra o link logado no claude.ai."
+    }[dbState];
+  }
+
+  // Grava uma marcação por vez por item; se o item mudar durante a gravação, grava de novo o valor mais recente.
+  const writing = new Map();
+  async function write(key) {
+    if (writing.has(key)) { writing.set(key, true); return; }
+    writing.set(key, false);
+    try {
+      do {
+        writing.set(key, false);
+        const v = checks.get(key) || { checked: false };
+        const body = { checked: !!v.checked, by: uid || null, at: v.at || new Date().toISOString() };
+        try {
+          await db.collection("checks").doc(key).set(body);
+        } catch (e) {
+          if (e && e.code === "unavailable") {
+            await new Promise(r => setTimeout(r, 600 + Math.random() * 800));
+            await db.collection("checks").doc(key).set(body);
+          } else throw e;
+        }
+      } while (writing.get(key));
+    } catch (e) {
+      if (e && (e.code === "invalid_argument" || e.code === "not_granted")) dbState = "readonly";
+      else if (e && (e.code === "revoked" || e.code === "capability_disabled" || e.code === "capability_removed")) dbState = "off";
+      setSync();
+      applyChecks();
+    } finally {
+      writing.delete(key);
+    }
+  }
+
+  document.getElementById("card-list").addEventListener("click", e => {
+    const a = e.target.closest("[data-jump]");
+    if (!a) return;
+    e.preventDefault();
+    const el = document.getElementById("card-" + a.dataset.jump);
+    if (el) el.scrollIntoView({ block: "start", behavior: "smooth" });
+  });
+  document.getElementById("card-list").addEventListener("change", e => {
+    const inp = e.target.closest("input[data-key]");
+    if (!inp || dbState !== "ready") return;
+    checks.set(inp.dataset.key, { checked: inp.checked, by: uid, at: new Date().toISOString() });
+    applyChecks();
+    write(inp.dataset.key);
+  });
+
+  async function resolveNames() {
+    if (!userCap || typeof userCap.profiles !== "function") return;
+    const ids = [...new Set([...checks.values()].map(v => v && v.by).filter(id => id && !asked.has(id)))];
+    if (!ids.length) return;
+    ids.forEach(id => asked.add(id));
+    try {
+      const ps = await userCap.profiles(ids);
+      ids.forEach(id => { if (ps && ps[id] && ps[id].name) names[id] = ps[id].name; });
+      applyChecks();
+    } catch (e) {}
+  }
+
+  async function connect() {
+    for (let i = 0; i < 20 && !(window.claude && window.claude.use); i++) await new Promise(r => setTimeout(r, 150));
+    if (!(window.claude && window.claude.use)) { dbState = "off"; setSync(); return; }
+    try { db = await window.claude.use("db"); } catch (e) { db = null; }
+    if (!db) { dbState = "off"; setSync(); return; }
+    try { userCap = await window.claude.use("user"); } catch (e) { userCap = null; }
+    if (userCap) {
+      try { uid = await userCap.id(); } catch (e) { uid = null; }
+      try { if (typeof userCap.can === "function" && (await userCap.can("data.write")) === false) dbState = "readonly"; } catch (e) {}
+    }
+    if (dbState === "loading") dbState = "ready";
+    setSync();
+    applyChecks();
+    db.collection("team").onSnapshot(snap => {
+      let changed = false;
+      snap.docs.forEach(d => {
+        const v = d.data();
+        if (!v || !(d.id in team)) return;
+        const n = typeof v.name === "string" ? v.name.slice(0, 40) : "";
+        if (team[d.id] !== n && !teamWriting.has(d.id)) { team[d.id] = n; changed = true; }
+      });
+      if (changed) renderAll(); else applyTeamInputs();
+    }, () => {});
+    db.collection("checks").onSnapshot(snap => {
+      checks.clear();
+      snap.docs.forEach(d => { const v = d.data(); if (v) checks.set(d.id, v); });
+      applyChecks();
+      resolveNames();
+    }, err => {
+      dbState = err && err.code === "revoked" ? "off" : (dbState === "ready" ? "off" : dbState);
+      setSync();
+      applyChecks();
+    });
+  }
+
+  // Abas
+  function setView(v, push) {
+    if (v !== "cards") v = "cronograma";
+    document.getElementById("view-cards").hidden = v !== "cards";
+    document.getElementById("view-cronograma").hidden = v !== "cronograma";
+    document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.view === v));
+    if (push) { try { history.replaceState(null, "", "#" + v); } catch (e) {} }
+  }
+  document.querySelector(".tabs").addEventListener("click", e => {
+    const t = e.target.closest(".tab"); if (t) setView(t.dataset.view, true);
+  });
+  function openCard(id) {
+    const c = cardById[id]; if (!c) return;
+    if (cfilter !== "all" && cfilter !== c.owner) {
+      cfilter = c.owner;
+      cchipsEl.querySelectorAll(".chip").forEach(ch => ch.setAttribute("aria-pressed", ch.dataset.k === cfilter));
+      renderCards();
+    }
+    setView("cards", true);
+    const el = document.getElementById("card-" + id);
+    if (el) el.scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+
+  setView((location.hash || "").replace("#", ""), false);
+  renderCards();
+  setSync();
+  renderGantt();
+  renderDetail();
+  renderBlocks();
+  renderLoad();
+  connect();
+})();
+</script>
+
+</body></html>
