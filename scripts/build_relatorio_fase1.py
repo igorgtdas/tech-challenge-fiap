@@ -25,12 +25,12 @@ GRAY = "7F7F7F"
 # Seções que ainda não estão prontas: o título sai em vermelho. Uma seção-mãe fica vermelha se alguma parte dela estiver pendente.
 PENDENTES = {
     "Sumário Executivo", "3. Principais achados",
-    "5. Oportunidades e priorização", "6. Mapa de agentes",
-    "7. Fichas dos agentes: responsabilidades, limites e autonomia", "7.1 Sentinela de Entregas", "7.2 Voz do Cliente", "7.3 Copiloto Operacional",
-    "8. Arquitetura conceitual", "8.1 Diagrama", "8.2 Fluxo das informações", "8.3 Governança, monitoramento e integrações futuras",
-    "9. Prompts estruturados", "9.1 Prompt · Sentinela de Entregas", "9.2 Prompt · Voz do Cliente", "9.3 Prompt · Copiloto Operacional",
-    "10. Impacto esperado e indicadores", "10.1 O que podemos e o que não podemos afirmar",
-    "11. Riscos, governança e autonomia", "12. Roadmap nas cinco fases", "13. Conclusão e recomendação", "Vídeo executivo",
+    "4. Oportunidades e priorização", "5. Mapa de agentes",
+    "6. Fichas dos agentes: responsabilidades, limites e autonomia", "6.1 [nome agente 1]", "6.2 [nome agente 2]", "6.3 [nome agente 3]",
+    "7. Arquitetura conceitual", "7.1 Diagrama", "7.2 Fluxo das informações", "7.3 Governança, monitoramento e integrações futuras",
+    "8. Prompts estruturados", "8.2 Prompt · [nome agente 1]", "8.3 Prompt · [nome agente 2]", "8.4 Prompt · [nome agente 3]",
+    "9. Impacto esperado e indicadores", "9.1 O que podemos e o que não podemos afirmar",
+    "10. Riscos, governança e autonomia", "11. Próximas fases", "12. Conclusão e recomendação", "Vídeo executivo",
 }
 
 
@@ -41,8 +41,8 @@ def titulo(doc, text, level=1):
     return p
 
 
-def afazer(doc, card, quem, texto):
-    """Caixa vermelha de pendência: a que card se refere, quem é o responsável e o que falta."""
+def afazer(doc, card, quem, texto, rotulo="A FAZER"):
+    """Caixa vermelha de pendência: a que card se refere, quem é o responsável e o que falta (texto ou lista de linhas)."""
     p = b._para(doc, align=WD_ALIGN_PARAGRAPH.LEFT, line=1.15, before=4, after=8)
     p.paragraph_format.left_indent = b.Cm(0.2)
     p.paragraph_format.right_indent = b.Cm(0.2)
@@ -56,9 +56,10 @@ def afazer(doc, card, quem, texto):
     shd = OxmlElement("w:shd")
     shd.set(qn("w:val"), "clear"); shd.set(qn("w:color"), "auto"); shd.set(qn("w:fill"), RED_FILL)
     pPr.append(shd)
-    b._font(p.add_run(f"A FAZER · Card {card} · {quem}"), 10, bold=True, color=RED)
-    p.add_run().add_break()
-    b._font(p.add_run(texto), 10, color=RED)
+    b._font(p.add_run(f"{rotulo} · Card {card} · {quem}"), 10, bold=True, color=RED)
+    for linha in ([texto] if isinstance(texto, str) else texto):
+        p.add_run().add_break()
+        b._font(p.add_run(linha), 10, color=RED)
     return p
 
 
@@ -96,8 +97,8 @@ def build():
         f"Analisamos {b.br_int(I['I01']['valor'])} pedidos da Olist ({I['I02']['texto']}) e encontramos um eixo claro: a entrega. "
         f"Com atraso, {pct('M01', 'atrasados')} dos clientes dão nota 1 ou 2; no prazo, {pct('M01', 'no prazo')}. O atraso dá sinais antes de acontecer, "
         "porque se forma no transporte e na postagem fora do prazo pelo vendedor. Ele se concentra em rotas longas, no Norte e no Nordeste e em poucos "
-        "meses de pico. Os comentários negativos falam principalmente de entrega e de produto. Recomendamos três agentes, com aprovação humana nas ações "
-        "que afetam o cliente: um que previne o atraso, um que lê e encaminha as avaliações e um copiloto para os gestores."
+        "meses de pico. Os comentários negativos falam principalmente de entrega e de produto. Recomendamos três agentes (a definir no mapa de agentes), "
+        "com aprovação humana nas ações que afetam o cliente."
     ))
     afazer(doc, "OLIST-7", "Diogo", "Fechar o sumário (até 1 página) depois de prontos os agentes, os KPIs e o roadmap; incluir 3–5 números de destaque do OLIST-4.")
 
@@ -181,17 +182,10 @@ def build():
         f"({pct('M05', '1ª compra nota 1-2')}) na primeira compra, o que indica que retenção pede ação ativa."
     ))
 
-    # ------------------------------------------------------------------ 4
-    titulo(doc, "4. Limitações")
-    b.body(doc, (
-        "Os dados vão de 2016 a 2018 e não trazem custos, transportadora, motivo de cancelamento nem registros de atendimento. As avaliações dependem de o "
-        "cliente responder, e os temas dos comentários foram classificados de forma aproximada. Por isso, os achados são hipóteses fortes, e o efeito de cada "
-        "agente só se mede em piloto."
-    ))
     n_tab = 2
 
-    # ------------------------------------------------------------------ 5
-    titulo(doc, "5. Oportunidades e priorização")
+    # ------------------------------------------------------------------ 4
+    titulo(doc, "4. Oportunidades e priorização")
     b.body(doc, f"Proposta inicial de oportunidades, derivada dos achados-chave (Tabela {n_tab + 1}):")
     n_tab += 1
     b.caption(doc, f"Tabela {n_tab}. Oportunidades candidatas e achado que as sustenta.")
@@ -200,108 +194,134 @@ def build():
     b.source(doc)
     afazer(doc, "OLIST-5", "Lorran", "Matriz de priorização com critérios e pesos próprios (somando 100%), notas justificadas, 3–4 oportunidades escolhidas, descartadas com motivo e formato visual (heatmap ou quadrante).")
 
-    # ------------------------------------------------------------------ 6
-    titulo(doc, "6. Mapa de agentes")
+    # ------------------------------------------------------------------ 5
+    titulo(doc, "5. Mapa de agentes")
     b.body(doc, (
-        "Proposta inicial de três agentes, que cobrem o ciclo da entrega: o primeiro age antes do problema, o segundo depois da reclamação e o "
-        f"terceiro apoia quem decide (Tabela {n_tab + 1})."
+        "Esta seção é do card OLIST-8 (Lorran): a escolha e o desenho dos agentes são dele. Abaixo está a estrutura a preencher, com os campos "
+        f"que o enunciado pede para cada agente (Tabela {n_tab + 1})."
     ))
-    agentes = [
-        ("Sentinela de Entregas", "Prevenir o atraso e avisar o cliente antes que ele aconteça",
-         "Atraso associado a 62% de notas 1–2; postagem fora do prazo eleva o atraso de 5% para 21%",
-         "Clientes, vendedores, time de operações", "Menos atrasos e menos notas negativas"),
-        ("Voz do Cliente", "Ler, classificar, priorizar e encaminhar avaliações e reclamações",
-         "10.838 comentários negativos sem leitura em escala; 45% sobre entrega, 32% sobre produto",
-         "Atendimento (SAC), time de lojistas", "Resposta mais rápida e problemas recorrentes visíveis"),
-        ("Copiloto Operacional", "Apoiar gestores com respostas, alertas e recomendações sobre atraso, vendedores e prazos",
-         "Atraso concentrado em rotas longas, Norte e Nordeste, meses de pico e alguns vendedores",
-         "Gestores de operações, logística e lojistas", "Decisões mais rápidas e prazos prometidos mais realistas"),
-    ]
     n_tab += 1
     b.caption(doc, f"Tabela {n_tab}. Mapa de agentes: nome, objetivo, problema, usuários e benefício.")
-    b.table(doc, ["Agente", "Objetivo", "Problema resolvido", "Usuários", "Benefício esperado"], [list(x) for x in agentes],
-            [2.6, 3.6, 4.0, 2.9, 2.9], size=8)
+    b.table(doc, ["Agente", "Objetivo", "Problema resolvido", "Usuários", "Benefício esperado"],
+            [[f"[nome agente {i}]", "", "", "", ""] for i in (1, 2, 3)], [2.8, 3.4, 3.8, 3.0, 3.0], size=8)
     b.source(doc)
-    afazer(doc, "OLIST-8", "Lorran", "Validar os agentes no Checkpoint 1, conferir que nome e escopo não repetem a referência e inserir o diagrama visual do mapa com os fluxos entre os agentes.")
+    afazer(doc, "OLIST-8", "Lorran", [
+        "Sugestão a partir dos achados (a decisão é do Lorran):",
+        f"• Sentinela de Entregas: previne o atraso e avisa o cliente antes. Com atraso, {pct('M01', 'atrasados', 0)} de notas 1–2 contra {pct('M01', 'no prazo', 0)}; "
+        f"postagem fora do prazo eleva o atraso de {pct('M07', 'atraso se postou no limite', 0)} para {pct('M07', 'atraso se postou fora', 0)}.",
+        f"• Voz do Cliente: lê, classifica e encaminha avaliações. São {b.br_int(o3['comentarios_negativos'])} comentários negativos; "
+        f"{pct('M03', 'entrega (qualquer)', 0)} falam de entrega e {pct('M03', 'produto (qualquer)', 0)} de produto.",
+        f"• Copiloto Operacional: apoia os gestores com alertas e recomendações. O atraso é de {pct('M06', 'Nordeste')} no Nordeste e tem picos de "
+        f"{pct('M11', 'nov/2017', 0)} a {pct('M11', 'mar/2018', 0)}.",
+        "Falta: escolher os agentes, conferir que nome e escopo não repetem a referência e inserir o diagrama do mapa com os fluxos entre eles.",
+    ], rotulo="SUGESTÃO E A FAZER")
+
+    # ------------------------------------------------------------------ 6
+    titulo(doc, "6. Fichas dos agentes: responsabilidades, limites e autonomia")
+    afazer(doc, "OLIST-8", "Lorran", "Preencher uma ficha por agente. As entradas e saídas devem ser descritas como lista de campos, para reaproveitar na Fase 3.")
+    campos = ["O que faz", "Entradas (campos)", "Saídas (campos)", "Ferramentas futuras", "O que nunca faz", "Quando aciona um humano",
+              "Nível de autonomia", "Por que agente, e não regra simples"]
+    for i in (1, 2, 3):
+        titulo(doc, f"6.{i} [nome agente {i}]", 2)
+        n_tab += 1
+        b.caption(doc, f"Tabela {n_tab}. Ficha do [nome agente {i}].")
+        b.table(doc, ["Campo", "Descrição"], [[c, ""] for c in campos], [5.0, 11.0], size=8)
 
     # ------------------------------------------------------------------ 7
-    titulo(doc, "7. Fichas dos agentes: responsabilidades, limites e autonomia")
-    fichas = [
-        ("7.1 Sentinela de Entregas",
-         "Monitora pedidos em andamento e age em sinais de risco: postagem após o prazo-limite, pedido parado no transporte além do normal para a rota, "
-         "pedido de alto risco (outro estado, mais de 10 kg, Norte ou Nordeste, mês de pico). Cobra o vendedor, avisa o cliente com nova previsão e escala para a logística.",
-         "Envia avisos padrão sozinho; compensação, cancelamento ou reembolso só com aprovação humana."),
-        ("7.2 Voz do Cliente",
-         "Classifica cada avaliação negativa por tema e urgência, rascunha a resposta, encaminha para a área certa e consolida os temas por vendedor e categoria.",
-         "Classifica e sugere; no início, toda resposta ao cliente passa por aprovação humana."),
-        ("7.3 Copiloto Operacional",
-         "Responde perguntas dos gestores em linguagem natural, aponta vendedores com atraso acima do esperado, sugere prazo prometido por rota e peso e alerta antes das datas de pico.",
-         "Só recomenda; toda decisão é humana."),
-    ]
-    for tit, faz, aut in fichas:
-        titulo(doc, tit, 2)
-        b.rich(b._para(doc, indent=True), f"**O que faz:** {faz}")
-        b.rich(b._para(doc, indent=True), f"**Autonomia:** {aut}")
-        afazer(doc, "OLIST-8", "Lorran", "Completar entradas e saídas (lista de campos), ferramentas futuras, o que o agente nunca faz, quando aciona humano e por que precisa de agente e não de regra simples.")
-
-    # ------------------------------------------------------------------ 8
-    titulo(doc, "8. Arquitetura conceitual")
-    titulo(doc, "8.1 Diagrama", 2)
+    titulo(doc, "7. Arquitetura conceitual")
+    titulo(doc, "7.1 Diagrama", 2)
     afazer(doc, "OLIST-10", "Igor", "Diagrama em uma página com fontes de dados (tabelas usadas por agente), os três agentes, usuários, entradas e saídas rotuladas nas setas e interações entre agentes.")
-    titulo(doc, "8.2 Fluxo das informações", 2)
+    titulo(doc, "7.2 Fluxo das informações", 2)
     b.body(doc, (
-        "Exemplo de fluxo entre os agentes: o Sentinela sinaliza um pedido em risco. O Voz do Cliente já recebe esse contexto quando o cliente reclama. "
-        "Os temas por vendedor alimentam o Copiloto, que recalibra prazos e limites de risco usados pelo Sentinela."
+        "Exemplo de fluxo: o [nome agente 1] sinaliza um pedido em risco. O [nome agente 2] já recebe esse contexto quando o cliente reclama. "
+        "Os temas consolidados alimentam o [nome agente 3], que recalibra os prazos e os limites de risco usados pelo [nome agente 1]."
     ))
     afazer(doc, "OLIST-10", "Igor", "Narrar de 6 a 8 passos de um pedido atrasado atravessando os agentes.")
-    titulo(doc, "8.3 Governança, monitoramento e integrações futuras", 2)
+    titulo(doc, "7.3 Governança, monitoramento e integrações futuras", 2)
     afazer(doc, "OLIST-10", "Igor", "Camada de governança com o ponto de aprovação humana; monitoramento dos agentes como conceito (ex.: LangSmith: execuções, custo, qualidade, escalonamentos); lista de integrações futuras.")
 
-    # ------------------------------------------------------------------ 9
-    titulo(doc, "9. Prompts estruturados")
-    b.body(doc, "Cada agente tem ao menos um prompt com quatro blocos:")
-    b.bullet(doc, "(a) objetivo;")
-    b.bullet(doc, "(b) contexto fornecido;")
-    b.bullet(doc, "(c) instrução principal, com papel, tarefa e formato de resposta;")
-    b.bullet(doc, "(d) resultado esperado.")
-    for i, (nome, *_r) in enumerate(agentes, start=1):
-        titulo(doc, f"9.{i} Prompt · {nome}", 2)
-        afazer(doc, "OLIST-9", "Lorran", "Prompt com os 4 blocos, regras para não inventar dados e escalar para humano, e um exemplo de entrada com registro real do dataset.")
+    # ------------------------------------------------------------------ 8
+    titulo(doc, "8. Prompts estruturados")
+    b.body(doc, (
+        "Cada agente tem ao menos um prompt com os quatro blocos pedidos pelo enunciado: objetivo, contexto fornecido, instrução principal e resultado "
+        "esperado. A seção 8.1 traz um modelo canônico para servir de base; as seções seguintes são para os prompts de cada agente."
+    ))
+    titulo(doc, "8.1 Modelo canônico de prompt", 2)
+    modelo = [
+        ("(a) Objetivo do prompt",
+         "Fazer o [nome agente] [tarefa de negócio, ex.: identificar pedidos com risco de atraso e preparar o aviso ao cliente], para melhorar "
+         "[KPI do agente, ex.: taxa de atraso e % de notas 1–2]."),
+        ("(b) Contexto fornecido",
+         "Dados do pedido vindos do dataset: [campos, ex.: order_id, data da compra, prazo prometido, data de postagem, prazo-limite do vendedor, "
+         "UF do cliente e do vendedor, peso, status]. Regras do negócio: [ex.: prazo-limite de postagem; quem pode autorizar compensação]."),
+        ("(c) Instrução principal",
+         "Você é o [nome agente] da Olist. Sua tarefa é [tarefa]. Use apenas os dados fornecidos e não invente informações. Se faltar um dado "
+         "necessário, responda \"dados insuficientes\" e encaminhe o caso para um humano. Nunca [limite, ex.: prometa reembolso ou cancele pedidos]. "
+         "Responda no formato definido em (d)."),
+        ("(d) Resultado esperado",
+         "Saída em campos: [ex.: order_id; nível de risco (baixo, médio ou alto); motivo em uma frase; ação recomendada; mensagem ao cliente "
+         "(até 3 linhas); precisa de humano (sim ou não)]."),
+    ]
+    n_tab += 1
+    b.caption(doc, f"Tabela {n_tab}. Modelo canônico de prompt, nos quatro blocos do enunciado.")
+    b.table(doc, ["Bloco", "Conteúdo"], [list(x) for x in modelo], [3.6, 12.4], size=8)
+    b.source(doc)
+    blocos = ["(a) Objetivo do prompt", "(b) Contexto fornecido", "(c) Instrução principal", "(d) Resultado esperado", "Exemplo de entrada (registro real do dataset)"]
+    for i in (1, 2, 3):
+        titulo(doc, f"8.{i + 1} Prompt · [nome agente {i}]", 2)
+        n_tab += 1
+        b.caption(doc, f"Tabela {n_tab}. Prompt do [nome agente {i}].")
+        b.table(doc, ["Bloco", "Conteúdo"], [[c, ""] for c in blocos], [5.0, 11.0], size=8)
+    afazer(doc, "OLIST-9", "Lorran", "Preencher um prompt por agente a partir do modelo 8.1, com um exemplo de entrada usando um registro real do dataset.")
 
-    # ------------------------------------------------------------------ 10
-    titulo(doc, "10. Impacto esperado e indicadores")
+    # ------------------------------------------------------------------ 9
+    titulo(doc, "9. Impacto esperado e indicadores")
     b.body(doc, f"Linhas de base medidas no dataset, que servirão de ponto de partida para os KPIs dos agentes (Tabela {n_tab + 1}):")
     base = [
-        ("Taxa de atraso", I["I05"]["texto"], "Sentinela, Copiloto"),
-        ("% de notas 1–2 entre atrasados", b.br_pct(V(o3, "M01", "atrasados")), "Sentinela"),
-        ("% de pedidos postados após o prazo-limite", b.br_pct(V(o3, "M07", "% postou fora do limite")), "Sentinela"),
-        ("% de avaliações negativas", I["I08"]["texto"], "Voz do Cliente"),
-        ("Nota média", I["I07"]["texto"], "Voz do Cliente"),
-        ("Atraso na região Nordeste", b.br_pct(V(o3, "M06", "Nordeste")), "Copiloto"),
-        ("Taxa de recompra", I["I12"]["texto"], "segunda onda (retenção)"),
+        ("Taxa de atraso", I["I05"]["texto"]),
+        ("% de notas 1–2 entre atrasados", pct("M01", "atrasados")),
+        ("% de pedidos postados após o prazo-limite", pct("M07", "% postou fora do limite")),
+        ("% de avaliações negativas", I["I08"]["texto"]),
+        ("Nota média", I["I07"]["texto"]),
+        ("Atraso na região Nordeste", pct("M06", "Nordeste")),
+        ("Taxa de recompra", I["I12"]["texto"]),
     ]
     n_tab += 1
     b.caption(doc, f"Tabela {n_tab}. Linhas de base dos indicadores.")
-    b.table(doc, ["Indicador", "Linha de base", "Agente"], [list(x) for x in base], [8.0, 3.5, 4.5])
+    b.table(doc, ["Indicador", "Linha de base", "Agente"], [[x, v, "[nome agente]"] for x, v in base], [8.0, 3.5, 4.5])
     b.source(doc, "Fonte: Elaboração própria a partir do dataset Olist (Kaggle).")
-    titulo(doc, "10.1 O que podemos e o que não podemos afirmar", 2)
+    titulo(doc, "9.1 O que podemos e o que não podemos afirmar", 2)
     afazer(doc, "OLIST-6", "Diogo", "Cadeia problema → mudança no processo → indicador → resultado por agente; ≥ 2 KPIs por agente com fórmula e baseline; quadro \"pode afirmar / precisa de mais dados / só prova em operação\"; indicadores de saúde dos agentes.")
 
-    # ------------------------------------------------------------------ 11
-    titulo(doc, "11. Riscos, governança e autonomia")
+    # ------------------------------------------------------------------ 10
+    titulo(doc, "10. Riscos, governança e autonomia")
     afazer(doc, "OLIST-8", "Lorran", "Tabela padronizada com ≥ 3 riscos por agente e mitigação (resposta inventada, viés, privacidade, autonomia excessiva, custo, adoção) e matriz de autonomia: faz sozinho / recomenda / exige aprovação humana.")
 
-    # ------------------------------------------------------------------ 12
-    titulo(doc, "12. Roadmap nas cinco fases")
-    afazer(doc, "OLIST-6", "Diogo", "O que fazemos em cada fase (1 a 5), o que preservamos da Fase 1 e os critérios para avançar de uma fase para a outra.")
+    # ------------------------------------------------------------------ 11
+    titulo(doc, "11. Próximas fases")
+    b.body(doc, (
+        "O enunciado prevê que o projeto evolua ao longo da Postech e seja reaproveitado nas fases seguintes (FIAP, 2026), e a evolução do projeto "
+        f"é um dos critérios de avaliação. A Tabela {n_tab + 1} indica o que deste relatório segue para cada fase."
+    ))
+    fases = [
+        ("Fase 2", "Estruturar casos de uso e desenho dos agentes"),
+        ("Fase 3", "Construir protótipos e validar soluções"),
+        ("Fase 4", "Orquestrar múltiplos agentes e automações"),
+        ("Fase 5", "Estruturar governança, liderança e escala corporativa"),
+    ]
+    n_tab += 1
+    b.caption(doc, f"Tabela {n_tab}. Próximas fases e o que este relatório leva para cada uma.")
+    b.table(doc, ["Fase", "Foco no enunciado", "O que este relatório leva"], [[f, foco, ""] for f, foco in fases], [2.0, 7.0, 7.0], size=8)
+    b.source(doc, "Fonte: Elaboração própria a partir do enunciado (FIAP, 2026).")
+    afazer(doc, "OLIST-6", "Diogo", "Preencher a última coluna: o que segue de cada parte deste relatório (achados, agentes, KPIs, arquitetura) para cada fase.")
 
-    # ------------------------------------------------------------------ 13
-    titulo(doc, "13. Conclusão e recomendação")
+    # ------------------------------------------------------------------ 12
+    titulo(doc, "12. Conclusão e recomendação")
     b.body(doc, (
         "Os dados apontam a entrega como o ponto de maior impacto na experiência do cliente da Olist. A recomendação é começar pelos agentes que agem "
         "antes do atraso e que dão escala à leitura das avaliações, sempre com aprovação humana nas ações que afetam o cliente."
     ))
-    afazer(doc, "OLIST-6", "Diogo", "Fechar a conclusão com a recomendação de decisão para a diretoria, alinhada à matriz, aos KPIs e ao roadmap.")
+    afazer(doc, "OLIST-6", "Diogo", "Fechar a conclusão com a recomendação de decisão para a diretoria, alinhada à matriz, aos KPIs e às próximas fases.")
 
     # ------------------------------------------------------------------ vídeo e referências
     titulo(doc, "Vídeo executivo")
