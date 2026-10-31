@@ -24,7 +24,7 @@ GRAY = "7F7F7F"
 
 # Seções que ainda não estão prontas: o título sai em vermelho. Uma seção-mãe fica vermelha se alguma parte dela estiver pendente.
 PENDENTES = {
-        "5. Mapa de agentes", "6. Fichas dos agentes: responsabilidades, limites e autonomia",
+        "6. Fichas dos agentes: responsabilidades, limites e autonomia",
                 "Vídeo executivo",
 }
 
@@ -275,7 +275,9 @@ def build():
 
     # ------------------------------------------------------------------ 5
     titulo(doc, "5. Mapa de agentes")
-    b.body(doc, f"As três oportunidades priorizadas viram três agentes que trabalham juntos (Tabela {n_tab + 1}).")
+    b.body(doc, f"As três oportunidades priorizadas viram três agentes que trabalham juntos (Figura {n_fig + 1} e Tabela {n_tab + 1}).")
+    n_fig += 1
+    b.figure(doc, n_fig, "Mapa de agentes: usuários, objetivo, fluxos e benefício.", config.ROOT / "docs" / "abnt" / "assets" / "mapa_agentes.png", 15.5)
     n_tab += 1
     b.caption(doc, f"Tabela {n_tab}. Mapa de agentes: nome, objetivo, problema, usuários e benefício.")
     b.table(doc, ["Agente", "Objetivo", "Problema resolvido", "Usuários", "Benefício esperado"], [
@@ -295,7 +297,6 @@ def build():
         f"O agente {AG[1]} associa avaliações a pedidos só quando o vínculo é confiável. O agente {AG[2]} usa os fatos confirmados e verifica origem, data e "
         "limitações do que recebe dos outros agentes. Toda resposta ao cliente depende de aprovação humana."
     ))
-    afazer(doc, "OLIST-8", "Lorran", "Inserir o diagrama do mapa com os três agentes e os fluxos entre eles (o enunciado pede o mapa como diagrama simples, com pouco texto).")
 
     # ------------------------------------------------------------------ 6
     titulo(doc, "6. Fichas dos agentes: responsabilidades, limites e autonomia")
