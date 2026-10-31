@@ -130,7 +130,7 @@ def build():
         f"mesmo valor. Fizemos {len(o3['achados'])} análises, cobrindo as 8 dimensões do dataset. Como os dados são observacionais, os achados são "
         "associações, não relações de causa. Os dados são históricos (2016–2018): permitem análise retrospectiva, mas não trazem rastreamento em "
         "tempo real, conversas de atendimento nem políticas vigentes. Antes de calcular qualquer número, aplicamos oito regras de qualidade (Tabela 2). "
-        "O dicionário de dados está no Apêndice A."
+        "O dicionário completo das tabelas e colunas está no repositório do projeto."
     ))
     regras_curtas = {
         "R1": "Pedido é contado pelo order_id, não pelas linhas de itens",
@@ -303,7 +303,7 @@ def build():
     b.body(doc, "Cada ficha mostra entradas, processamento, saída, usuários, indicadores e limites de autonomia do agente.")
     for i, (fic, cap) in enumerate([("ficha_agente1.png", AG[0]), ("ficha_agente2.png", AG[1]), ("ficha_agente3.png", AG[2])], start=1):
         n_fig += 1
-        b.figure(doc, n_fig, f"Ficha do agente {i}: {cap}.", lorran / fic, 14.5)
+        b.figure(doc, n_fig, f"Ficha do agente {i}: {cap}.", lorran / fic, 12.0)
 
     # ------------------------------------------------------------------ 7
     titulo(doc, "7. Arquitetura conceitual")
@@ -579,15 +579,6 @@ def build():
     ]:
         p = b._para(doc, align=WD_ALIGN_PARAGRAPH.LEFT, line=1.0, after=12)
         b._font(p.add_run(ref), 11)
-
-    # ------------------------------------------------------------------ apêndices
-    p = b._para(doc); p.add_run().add_break(WD_BREAK.PAGE)
-    titulo(doc, "Apêndice A – Dicionário de dados")
-    overview, tabs = b.parse_dictionary()
-    b.caption(doc, "Tabela A.1. Tabelas do dataset: o que é e para que serve.")
-    b.table(doc, ["Tabela", "O que é", "Para que serve"],
-            [[b.plain(b.re.sub(r"\s*\(.*?\)", "", r[0])).replace("**", ""), b.plain(r[1]), b.plain(r[4])] for r in overview], [3.2, 6.0, 6.8], size=8)
-    b.source(doc)
 
     doc.save(OUT)
     print("Word:", OUT)
