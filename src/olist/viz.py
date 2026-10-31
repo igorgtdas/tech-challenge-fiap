@@ -11,10 +11,12 @@ from matplotlib import font_manager
 
 from . import config
 
-# Paleta categórica (ordem fixa) e cores de texto/superfície
-SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6"]
+# Paleta das diretrizes visuais do grupo (OLIST-4/7): azul elétrico para o caso normal,
+# coral só para risco ou gargalo, azul escuro para estrutura; as demais cores são reserva.
+SERIES = ["#00B4D8", "#FF4D4D", "#0A192F", "#eda100", "#e87ba4", "#008300", "#6250d6"]
+NAVY = "#0A192F"
 MUTED = "#b9b8b2"        # barras "de contexto" (ex.: meses de borda)
-TEXT = "#0b0b0b"
+TEXT = "#0A192F"
 TEXT_2 = "#52514e"
 GRID = "#e6e5e0"
 SURFACE = "#ffffff"

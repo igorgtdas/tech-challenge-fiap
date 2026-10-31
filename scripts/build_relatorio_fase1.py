@@ -24,8 +24,7 @@ GRAY = "7F7F7F"
 
 # Seções que ainda não estão prontas: o título sai em vermelho. Uma seção-mãe fica vermelha se alguma parte dela estiver pendente.
 PENDENTES = {
-    "Sumário Executivo", "3. Principais achados",
-    "5. Mapa de agentes", "6. Fichas dos agentes: responsabilidades, limites e autonomia",
+        "5. Mapa de agentes", "6. Fichas dos agentes: responsabilidades, limites e autonomia",
                 "Vídeo executivo",
 }
 
@@ -90,13 +89,26 @@ def build():
     # ------------------------------------------------------------------ sumário executivo
     titulo(doc, "Sumário Executivo")
     b.body(doc, (
-        f"Analisamos {b.br_int(I['I01']['valor'])} pedidos da Olist ({I['I02']['texto']}) e encontramos um eixo claro: a entrega. "
-        f"Com atraso, {pct('M01', 'atrasados')} dos clientes dão nota 1 ou 2; no prazo, {pct('M01', 'no prazo')}. O atraso dá sinais antes de acontecer, "
-        "porque se forma no transporte e na postagem fora do prazo pelo vendedor. Ele se concentra em rotas longas, no Norte e no Nordeste e em poucos "
-        "meses de pico. Os comentários negativos falam principalmente de entrega e de produto. Recomendamos três agentes, que recomendam e encaminham, "
-        "com aprovação humana nas ações que afetam o cliente: Sentinela de Entregas, Voz do Cliente e Copiloto de Atendimento."
+        "A Olist pode usar IA Generativa e Agentes de IA para atacar o ponto que mais pesa na experiência do cliente: a entrega. Analisamos "
+        f"{b.br_int(I['I01']['valor'])} pedidos ({I['I02']['texto']}) com regras de qualidade documentadas, e os dados mostram que o atraso aparece "
+        "junto com a maior parte da insatisfação, dá sinais antes de acontecer e se concentra em rotas, vendedores e meses identificáveis. "
+        "Também há milhares de comentários em texto que hoje não são lidos em escala."
     ))
-    afazer(doc, "OLIST-7", "Diogo", "Fechar o sumário (até 1 página) depois de prontos os agentes, os KPIs e o roadmap; incluir 3–5 números de destaque do OLIST-4.")
+    b.caption(doc, "Tabela 1. Números de destaque.")
+    b.table(doc, ["Número", "O que mostra"], [
+        [f"{pct('M01', 'atrasados', 0)} × {pct('M01', 'no prazo', 0)}", "notas 1 ou 2 em pedidos atrasados, contra pedidos entregues no prazo"],
+        [f"{pct('M02', 'de atrasados', 0)}", f"das avaliações negativas vêm dos atrasados, que são só {I['I05']['texto']} das entregas"],
+        [f"{pct('M07', 'atraso se postou fora', 0)} × {pct('M07', 'atraso se postou no limite', 0)}", "atraso quando o vendedor posta depois do prazo-limite, contra quando posta no prazo"],
+        [f"{b.br_int(o3['comentarios_negativos'])}", f"comentários negativos em texto; {pct('M03', 'entrega (qualquer)', 0)} falam de entrega"],
+        [f"{pct('M06', 'Nordeste')} × {pct('M06', 'Sudeste')}", "atraso no Nordeste, contra o Sudeste"],
+    ], [3.6, 12.4], size=8.5)
+    b.source(doc, "Fonte: Elaboração própria a partir do dataset Olist (Kaggle).")
+    b.body(doc, (
+        "Propomos três agentes especialistas, coordenados por um orquestrador e revisados por um validador, sempre com aprovação humana nas ações "
+        "que afetam o cliente: o Sentinela de Entregas, que sinaliza pedidos em risco; o Voz do Cliente, que classifica as avaliações; e o Copiloto de "
+        "Atendimento, que prepara respostas para os atendentes. A recomendação à diretoria é aprovar um piloto dos dois primeiros, os mais bem pontuados "
+        "na matriz de priorização, preparar as integrações para o terceiro e definir as metas depois do piloto, comparando com as linhas de base deste relatório."
+    ))
 
     # ------------------------------------------------------------------ 1
     titulo(doc, "1. Contexto, pergunta e escopo")
@@ -117,7 +129,7 @@ def build():
         f"{b.br_int(meta['clientes'])} clientes. As análises foram feitas em Python, e cada número tem uma fórmula do Excel equivalente, que chegou ao "
         f"mesmo valor. Fizemos {len(o3['achados'])} análises, cobrindo as 8 dimensões do dataset. Como os dados são observacionais, os achados são "
         "associações, não relações de causa. Os dados são históricos (2016–2018): permitem análise retrospectiva, mas não trazem rastreamento em "
-        "tempo real, conversas de atendimento nem políticas vigentes. Antes de calcular qualquer número, aplicamos oito regras de qualidade (Tabela 1). "
+        "tempo real, conversas de atendimento nem políticas vigentes. Antes de calcular qualquer número, aplicamos oito regras de qualidade (Tabela 2). "
         "O dicionário de dados está no Apêndice A."
     ))
     regras_curtas = {
@@ -130,16 +142,15 @@ def build():
         "R7": "Geolocalização reduzida a 1 ponto por CEP",
         "R8": "Valor do pedido = soma dos pagamentos",
     }
-    b.caption(doc, "Tabela 1. Regras de qualidade aplicadas.")
+    b.caption(doc, "Tabela 2. Regras de qualidade aplicadas.")
     b.table(doc, ["Regra", "O que garante", "Registros afetados"],
             [[r["id"], regras_curtas[r["id"]], b.br_int(r["afetados"])] for r in o2["regras"]], [1.4, 11.0, 3.6], size=8)
     b.source(doc)
 
     # ------------------------------------------------------------------ 3
     titulo(doc, "3. Principais achados")
-    afazer(doc, "OLIST-4", "Diogo", "Texto e números desta seção estão prontos. Falta trocar ou complementar as figuras pelos gráficos finais no padrão visual do relatório.")
-    b.body(doc, "A Tabela 2 reúne os achados mais relevantes, em ordem de importância para a escolha dos agentes. Em seguida, cada tema é resumido.")
-    b.caption(doc, "Tabela 2. Achados mais relevantes e desafios do enunciado.")
+    b.body(doc, "A Tabela 3 reúne os achados mais relevantes, em ordem de importância para a escolha dos agentes. Em seguida, cada tema é resumido.")
+    b.caption(doc, "Tabela 3. Achados mais relevantes e desafios do enunciado.")
     b.table(doc, ["#", "Achado", "Evidência nos dados", "Desafios"],
             [[k["rank"], k["titulo"], k["resumo"], k["desafios"]] for k in o3["chave"]], [0.7, 3.6, 7.6, 4.1], size=8)
     b.source(doc)
@@ -149,27 +160,30 @@ def build():
         f"Com atraso, {pct('M01', 'atrasados')} dos clientes dão nota 1 ou 2; no prazo, {pct('M01', 'no prazo')} (Figura 1). Os atrasados são "
         f"{pct('M02', 'atrasados no total')} dos pedidos entregues, mas concentram {pct('M02', 'de atrasados')} das notas negativas. O atraso se forma no transporte: "
         f"{dias('M07', 'transporte · atrasados')} dias nos atrasados, contra {dias('M07', 'transporte · no prazo')} nos demais, com um prazo prometido parecido "
-        f"para os dois grupos. Também dá sinal cedo: quando o vendedor posta depois do prazo-limite ({pct('M07', '% postou fora do limite')} dos pedidos), "
+        f"para os dois grupos (Figura 2). Também dá sinal cedo: quando o vendedor posta depois do prazo-limite ({pct('M07', '% postou fora do limite')} dos pedidos), "
         f"o atraso sobe de {pct('M07', 'atraso se postou no limite')} para {pct('M07', 'atraso se postou fora')}. "
         f"Entre os vendedores com 50 ou mais entregas, {pct('M08', '% (50+ entregas) com 2× a média', 0)} atrasam o dobro da média ou mais."
     ))
     b.figure(doc, 1, "Percentual de notas 1 ou 2 por faixa de atraso.", fig("o3_n1_atraso_nota"), 12.0)
+    b.figure(doc, 2, "Tempo médio por etapa do ciclo do pedido.", fig("o3_d1_etapas_ciclo"), 12.5)
 
     titulo(doc, "3.2 Onde e quando o atraso acontece", 2)
     b.body(doc, (
         f"O atraso é de {pct('M06', 'Nordeste')} no Nordeste e {pct('M06', 'Norte')} no Norte, contra {pct('M06', 'Sudeste')} no Sudeste. Quando vendedor e "
         f"cliente estão em estados diferentes, {pct('M12', 'atraso · outra UF')}; no mesmo estado, {pct('M12', 'atraso · mesma UF')}. No tempo, há picos: "
-        f"{pct('M11', 'nov/2017')} na Black Friday de 2017 e {pct('M11', 'mar/2018')} em março de 2018, contra cerca de 4% nos meses normais (Figura 2). "
+        f"{pct('M11', 'nov/2017')} na Black Friday de 2017 e {pct('M11', 'mar/2018')} em março de 2018, contra cerca de 4% nos meses normais (Figura 3). "
         "Nesses meses, a nota média também cai."
     ))
-    b.figure(doc, 2, "Pedidos entregues e taxa de atraso por mês.", fig("o3_d5_sazonalidade"), 13.0)
+    b.figure(doc, 3, "Pedidos entregues e taxa de atraso por mês.", fig("o3_d5_sazonalidade"), 13.0)
 
     titulo(doc, "3.3 O que o cliente escreve", 2)
     b.body(doc, (
         f"Há {b.br_int(o3['comentarios_negativos'])} comentários em avaliações com nota 1 ou 2. Pela classificação por palavras-chave, "
         f"{pct('M03', 'entrega (qualquer)', 0)} falam de entrega e {pct('M03', 'produto (qualquer)', 0)} de produto errado, incompleto ou com defeito. "
-        "É um volume de texto em português que hoje não tem leitura em escala, um caso típico para IA generativa."
+        "É um volume de texto em português que hoje não tem leitura em escala, um caso típico para IA generativa (Figura 4)."
     ))
+
+    b.figure(doc, 4, "Temas dos comentários de avaliações com nota 1 ou 2.", fig("o3_n3_temas_comentarios"), 12.5)
 
     titulo(doc, "3.4 Outros sinais", 2)
     b.body(doc, (
@@ -180,8 +194,8 @@ def build():
         f"({pct('M05', '1ª compra nota 1-2')}) na primeira compra, o que indica que retenção pede ação ativa."
     ))
 
-    n_tab = 2
-    n_fig = 2
+    n_tab = 3
+    n_fig = 4
     lorran = config.ROOT / "docs" / "abnt" / "assets" / "lorran"
     AG = ["Sentinela de Entregas", "Voz do Cliente", "Copiloto de Atendimento"]
 
@@ -286,11 +300,7 @@ def build():
     # ------------------------------------------------------------------ 6
     titulo(doc, "6. Fichas dos agentes: responsabilidades, limites e autonomia")
     b.body(doc, "Cada ficha mostra entradas, processamento, saída, usuários, indicadores e limites de autonomia do agente.")
-    afazer(doc, "OLIST-8", "Lorran", [
-        f"Atualizar os nomes nas três figuras: Monitoramento Logístico → {AG[0]}; Inteligência de Reviews → {AG[1]}; Apoio ao Atendimento → {AG[2]} "
-        "(os nomes antigos são iguais aos do relatório de referência).",
-        "Acrescentar em cada ficha por que o caso precisa de agente, e não de uma regra simples.",
-    ])
+    afazer(doc, "OLIST-8", "Lorran", "Acrescentar em cada ficha por que o caso precisa de agente, e não de uma regra simples.")
     for i, (fic, cap) in enumerate([("ficha_agente1.png", AG[0]), ("ficha_agente2.png", AG[1]), ("ficha_agente3.png", AG[2])], start=1):
         n_fig += 1
         b.figure(doc, n_fig, f"Ficha do agente {i}: {cap}.", lorran / fic, 14.5)
