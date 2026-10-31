@@ -206,5 +206,5 @@ path([(82.6, 34.4), (82.6, 22.0), (GOV_X, 22.0)], color=MUTED, lw=1.0, ls=(0, (2
 ASSETS = ROOT / "docs" / "abnt" / "assets"
 for out in (config.FIGURES / "o10_arquitetura.png", ASSETS / "arquitetura_agentes_olist10.png"):
     out.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out, dpi=200, bbox_inches="tight", facecolor=BOARD_BG)
+    fig.savefig(out, dpi=300, bbox_inches="tight", facecolor=BOARD_BG)
     print(out)
