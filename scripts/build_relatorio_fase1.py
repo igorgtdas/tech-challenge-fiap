@@ -307,7 +307,7 @@ def build():
     ))
     titulo(doc, "7.1 Diagrama", 2)
     n_fig += 1
-    b.figure(doc, n_fig, "Arquitetura conceitual dos agentes.", config.FIGURES / "o10_arquitetura.png", 16.0)
+    b.figure(doc, n_fig, "Arquitetura conceitual dos agentes.", config.ROOT / "docs" / "abnt" / "assets" / "arquitetura_agentes_olist10.png", 16.0)
     titulo(doc, "7.2 Exemplo de ponta a ponta: um pedido atrasado", 2)
     passos = [
         f"A rotina diária aciona o Orquestrador, que envia ao {AG[0]} a varredura dos pedidos em aberto.",
