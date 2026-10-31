@@ -24,7 +24,7 @@ GRAY = "7F7F7F"
 
 # Seções que ainda não estão prontas: o título sai em vermelho. Uma seção-mãe fica vermelha se alguma parte dela estiver pendente.
 PENDENTES = {
-        "6. Fichas dos agentes: responsabilidades, limites e autonomia",
+
                 "Vídeo executivo",
 }
 
@@ -301,7 +301,6 @@ def build():
     # ------------------------------------------------------------------ 6
     titulo(doc, "6. Fichas dos agentes: responsabilidades, limites e autonomia")
     b.body(doc, "Cada ficha mostra entradas, processamento, saída, usuários, indicadores e limites de autonomia do agente.")
-    afazer(doc, "OLIST-8", "Lorran", "Acrescentar em cada ficha por que o caso precisa de agente, e não de uma regra simples.")
     for i, (fic, cap) in enumerate([("ficha_agente1.png", AG[0]), ("ficha_agente2.png", AG[1]), ("ficha_agente3.png", AG[2])], start=1):
         n_fig += 1
         b.figure(doc, n_fig, f"Ficha do agente {i}: {cap}.", lorran / fic, 14.5)
