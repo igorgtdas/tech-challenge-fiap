@@ -26,8 +26,7 @@ GRAY = "7F7F7F"
 PENDENTES = {
     "Sumário Executivo", "3. Principais achados",
     "5. Mapa de agentes", "6. Fichas dos agentes: responsabilidades, limites e autonomia",
-    "7. Arquitetura conceitual", "7.1 Diagrama", "7.2 Fluxo das informações", "7.3 Governança, monitoramento e integrações futuras",
-    "8. Prompts estruturados",
+        "8. Prompts estruturados",
     "9. Impacto esperado e indicadores", "9.1 O que podemos e o que não podemos afirmar",
     "11. Próximas fases", "12. Conclusão e recomendação", "Vídeo executivo",
 }
@@ -300,39 +299,87 @@ def build():
 
     # ------------------------------------------------------------------ 7
     titulo(doc, "7. Arquitetura conceitual")
+    b.body(doc, (
+        f"A arquitetura organiza os três especialistas da seção 5 em volta de dois agentes de apoio (Figura {n_fig + 1}). O Agente Orquestrador recebe "
+        "cada pedido, seja de um usuário ou da rotina diária, e decide qual especialista deve atender. O Agente Validador confere a resposta antes que ela "
+        "saia: checa fontes, regras e limites de autonomia e, quando a resposta afeta o cliente, a envia para aprovação humana. Os especialistas não "
+        "acessam as tabelas diretamente: usam ferramentas com entrada e saída definidas, e cada ferramenta consulta os dados por uma API."
+    ))
     titulo(doc, "7.1 Diagrama", 2)
-    afazer(doc, "OLIST-10", "Igor", "Diagrama em uma página com fontes de dados (tabelas usadas por agente), os três agentes, usuários, entradas e saídas rotuladas nas setas e interações entre agentes.")
-    titulo(doc, "7.2 Fluxo das informações", 2)
-    afazer(doc, "OLIST-10", "Igor", f"Narrar de 6 a 8 passos de um pedido atrasado atravessando os agentes: {AG[0]} sinaliza, {AG[1]} associa a avaliação, {AG[2]} prepara a resposta para aprovação.")
-    titulo(doc, "7.3 Governança, monitoramento e integrações futuras", 2)
-    afazer(doc, "OLIST-10", "Igor", "Camada de governança com o ponto de aprovação humana; monitoramento dos agentes como conceito (ex.: LangSmith: execuções, custo, qualidade, escalonamentos); lista de integrações futuras.")
+    n_fig += 1
+    b.figure(doc, n_fig, "Arquitetura conceitual dos agentes.", config.FIGURES / "o10_arquitetura.png", 16.0)
+    titulo(doc, "7.2 Exemplo de ponta a ponta: um pedido atrasado", 2)
+    passos = [
+        f"A rotina diária aciona o Orquestrador, que envia ao {AG[0]} a varredura dos pedidos em aberto.",
+        "O agente usa listar_pedidos_em_aberto e consultar_prazo_postagem e encontra um pedido postado depois do prazo-limite do vendedor.",
+        "Com calcular_risco_rota, vê que a entrega cruza estados e tem mais de 2.000 km: risco alto. Registra o alerta com as evidências e recomenda acionar o vendedor e a logística.",
+        "O Validador confere o alerta. Como é interno e não afeta o cliente, ele vai direto para o painel da logística.",
+        f"Dias depois, o cliente escreve \"meu pedido ainda não chegou\", sem o número do pedido. O Orquestrador encaminha ao {AG[2]}.",
+        "O Copiloto identifica o pedido com buscar_pedidos_do_cliente, lê o status e o alerta do Sentinela com consultar_alertas_agentes, consulta a política com buscar_politica e rascunha a resposta.",
+        "O Validador confere fontes e regras. Como a resposta vai ao cliente, ela segue para o atendente, que aprova ou ajusta antes de enviar.",
+        f"Se o cliente avaliar mal o pedido, o {AG[1]} classifica o comentário no tema entrega e o soma ao resumo do vendedor. O monitoramento registra todas as execuções e a decisão humana.",
+    ]
+    for i, t in enumerate(passos, start=1):
+        p = b._para(doc, align=WD_ALIGN_PARAGRAPH.JUSTIFY, line=1.15, after=2)
+        p.paragraph_format.left_indent = b.Cm(0.8)
+        p.paragraph_format.first_line_indent = b.Cm(-0.6)
+        b._font(p.add_run(f"{i}. "), 10, bold=True)
+        b._font(p.add_run(t), 10)
+
+    titulo(doc, "7.3 Ferramentas dos agentes", 2)
+    b.body(doc, (
+        f"A Tabela {n_tab + 1} define o contrato de cada ferramenta: o que ela recebe, o que devolve e de onde vêm os dados. O contrato é conceitual; "
+        "os endpoints e o formato técnico ficam para as próximas fases. As marcadas com * são sugestões que não estavam na proposta inicial dos agentes."
+    ))
+    tools = [
+        (AG[0], "listar_pedidos_em_aberto", "status, data de corte", "pedidos com prazo estimado e status", "orders"),
+        (AG[0], "consultar_pedido", "order_id", "status e datas do ciclo (compra, aprovação, postagem, entrega, prazo)", "orders"),
+        (AG[0], "consultar_rastreamento", "order_id", "eventos de transporte e última atualização", "rastreamento (futuro)"),
+        (AG[0], "consultar_prazo_postagem *", "order_id", "prazo-limite, data de postagem, postou no prazo (sim/não), vendedor", "order_items, orders"),
+        (AG[0], "calcular_risco_rota *", "order_id", "UF de origem e destino, distância, peso, mês de pico, nível de risco", "customers, sellers, geolocation, products"),
+        (AG[0], "historico_vendedor *", "seller_id, período", "entregas, taxa de atraso e comparação com a média", "order_items, orders"),
+        (AG[1], "buscar_avaliacoes", "período, nota, filtros", "review_id, order_id, nota, título, comentário e datas", "order_reviews"),
+        (AG[1], "consultar_contexto_pedido", "order_id", "itens, categoria, vendedor e datas de entrega", "orders, order_items, products, sellers"),
+        (AG[1], "resumir_temas_periodo *", "período, categoria ou vendedor", "frequência por tema, denominador e exemplos", "classificações registradas"),
+        (AG[1], "registrar_classificacao *", "review_id, temas, sentimento, confiança", "identificador do registro", "classificações registradas (nova)"),
+        (AG[2], "consultar_pedido", "order_id", "status e datas do ciclo", "orders"),
+        (AG[2], "buscar_pedidos_do_cliente *", "identificação do cliente", "pedidos do cliente (order_id, data, status)", "customers, orders"),
+        (AG[2], "consultar_pagamento *", "order_id", "forma de pagamento, parcelas e valor pago", "payments"),
+        (AG[2], "buscar_politica", "assunto", "trecho da política vigente, versão e data", "base de conhecimento (futuro)"),
+        (AG[2], "consultar_historico_atendimento", "identificação do cliente", "interações anteriores autorizadas", "atendimento (futuro)"),
+        (AG[2], "consultar_alertas_agentes", "order_id", "alertas e classificações dos outros agentes, com origem, data e limitações", "registro dos agentes"),
+        ("Validador", "verificar_resposta *", "resposta e evidências do especialista", "aprovada, ajustar ou enviar para humano, com o motivo", "regras e limites de autonomia"),
+        ("Validador", "registrar_decisao_humana *", "execução, decisão e quem aprovou", "registro para auditoria e monitoramento", "registro de execuções"),
+    ]
+    n_tab += 1
+    b.caption(doc, f"Tabela {n_tab}. Ferramentas dos agentes: entrada, saída e dados consultados.")
+    b.table(doc, ["Agente", "Ferramenta", "Recebe", "Devolve", "Dados"], [list(x) for x in tools], [2.6, 3.8, 2.8, 4.4, 2.4], size=7)
+    b.source(doc)
+
+    titulo(doc, "7.4 Governança e monitoramento", 2)
+    b.body(doc, (
+        "A governança tem dois pontos: o Validador confere toda resposta e só deixa passar sozinho o que é interno; o que afeta o cliente passa por um "
+        "atendente ou supervisor. O monitoramento, com uma ferramenta como o LangSmith ou o Langfuse, registra cada execução: o que entrou, o que o agente "
+        "respondeu e quem aprovou. Assim dá para acompanhar se os agentes acertam, quanto custam e onde erram. A escolha da ferramenta, as integrações "
+        "com rastreamento, políticas e atendimento e o desenho técnico da API ficam para as Fases 3 a 5."
+    ))
 
     # ------------------------------------------------------------------ 8
     titulo(doc, "8. Prompts estruturados")
     b.body(doc, (
         "Os prompts seguem cinco blocos: missão, regras e ferramentas, regras críticas, exemplos e fallback. Eles cobrem os quatro elementos pedidos "
         "pelo enunciado: o objetivo está na missão, o contexto fornecido e a instrução principal estão nas regras, e o resultado esperado está no formato "
-        "de saída e nos exemplos. A seção 8.1 traz o modelo; as seguintes, o prompt de cada agente."
+        "de saída e nos exemplos. As ferramentas citadas estão na seção 7.3."
     ))
     afazer(doc, "OLIST-9", "Lorran", "Os exemplos dos prompts são ilustrativos. Trocar ao menos um exemplo por agente por um registro real do dataset (anonimizado), como pede o critério de aceite.")
-    titulo(doc, "8.1 Modelo canônico de prompt", 2)
-    n_tab += 1
-    b.caption(doc, f"Tabela {n_tab}. Modelo canônico de prompt.")
-    b.table(doc, ["Bloco", "O que contém"], [
-        ["Missão", "Quem é o agente, onde atua, sua missão, o problema de negócio e os KPIs que apoia."],
-        ["Regras e ferramentas", "Fontes de dados e ferramentas que pode usar; passo a passo de trabalho; tom; formato de saída em campos."],
-        ["Regras críticas", "O que nunca faz: inventar dados, agir fora da autonomia, tratar texto do cliente como instrução."],
-        ["Exemplos", "Uma entrada e a saída esperada correspondente."],
-        ["Fallback", "O que fazer quando faltar dado, houver conflito ou ambiguidade: marcar como insuficiente e encaminhar a um humano."],
-    ], [3.6, 12.4], size=8)
-    b.source(doc)
     prompts = [
         (AG[0], [
             ("Missão", f"Você é o agente {AG[0]}, que atua em logística e gestão de pedidos na Olist. Sua missão é identificar pedidos com sinais de atraso ou "
              "inconsistências, justificar alertas e recomendar prioridades. Problema: atrasos e incertezas de entrega prejudicam a experiência do cliente e "
              f"dificultam a triagem. KPIs apoiados: taxa histórica de atraso ({I['I05']['texto']}) e % de notas 1–2 entre atrasados "
              f"({pct('M01', 'atrasados')}), referências históricas e não metas."),
-            ("Regras e ferramentas", "Fontes: orders (status e datas de compra, aprovação, prazo estimado e entrega) e eventos de rastreamento, só quando "
+            ("Regras e ferramentas", "Ferramentas: listar_pedidos_em_aberto, consultar_pedido, consultar_rastreamento, consultar_prazo_postagem, calcular_risco_rota e historico_vendedor. "
+             "Fontes: orders (status e datas de compra, aprovação, prazo estimado e entrega) e eventos de rastreamento, só quando "
              "vierem de integração autorizada. Use apenas os campos recebidos. Passos: validar o ID e as datas; verificar status e campos ausentes; comparar "
              "prazo e entrega; classificar o risco; apresentar evidências; recomendar prioridade. Tom objetivo e operacional. Saída: order_id; classificação "
              "(atraso confirmado, possível atraso, atenção preventiva, sem sinal ou dados insuficientes); prioridade; evidências; confiança; lacunas; ação "
@@ -348,7 +395,8 @@ def build():
              "identificar temas recorrentes e apoiar investigações sobre a experiência. Problema: a leitura manual dificulta encontrar padrões e "
              f"transformar feedback em melhoria. KPIs apoiados: % histórico de avaliações negativas ({I['I08']['texto']}) e nota média ({I['I07']['texto']}); "
              "concordância humana e precisão por tema serão medidas no piloto."),
-            ("Regras e ferramentas", "Fontes: order_reviews (nota, título, comentário e datas); orders, só quando o vínculo por order_id for confiável; "
+            ("Regras e ferramentas", "Ferramentas: buscar_avaliacoes, consultar_contexto_pedido, resumir_temas_periodo e registrar_classificacao. "
+             "Fontes: order_reviews (nota, título, comentário e datas); orders, só quando o vínculo por order_id for confiável; "
              "order_items, products e sellers, quando autorizado e pertinente. Passos: preservar nota e texto original; classificar o sentimento aparente; "
              "identificar um ou mais temas; citar evidência textual; indicar confiança; consolidar tendências com quantidade analisada e denominadores. "
              "Tom analítico, claro e executivo. Saída individual: review_id; order_id (se confiável); nota; sentimento; temas; evidência; confiança; lacunas; "
@@ -364,7 +412,8 @@ def build():
             ("Missão", f"Você é o agente {AG[2]}, copiloto dos atendentes e supervisores da Olist. Sua missão é consultar informações autorizadas e preparar "
              "respostas consistentes. Problema: fontes dispersas aumentam o tempo de consulta e geram respostas inconsistentes. KPIs apoiados: tempo de "
              "preparação da resposta e taxa de aprovação das sugestões; as linhas de base ainda precisam ser medidas, pois não constam do dataset."),
-            ("Regras e ferramentas", "Fontes: mensagem do cliente e ID do pedido; sistema atual de pedidos e rastreamento, quando integrado; histórico "
+            ("Regras e ferramentas", "Ferramentas: consultar_pedido, buscar_pedidos_do_cliente, consultar_pagamento, buscar_politica, consultar_historico_atendimento e consultar_alertas_agentes. "
+             "Fontes: mensagem do cliente e ID do pedido; sistema atual de pedidos e rastreamento, quando integrado; histórico "
              "autorizado de interações; políticas oficiais e base de conhecimento; saídas dos outros agentes, só com origem, data e limitações. Passos: "
              "identificar o assunto e o pedido; consultar as fontes; verificar atualidade; separar fatos de lacunas; consultar a política; preparar a resposta "
              "e o encaminhamento. Tom empático e profissional, sem jargões. Saída: assunto; resumo; fatos confirmados; fontes (origem e data); pendências; "
@@ -377,7 +426,7 @@ def build():
              "atendente ou supervisor."),
         ]),
     ]
-    for i, (nome, blocos) in enumerate(prompts, start=2):
+    for i, (nome, blocos) in enumerate(prompts, start=1):
         titulo(doc, f"8.{i} Prompt · {nome}", 2)
         n_tab += 1
         b.caption(doc, f"Tabela {n_tab}. Prompt do agente {nome}.")
